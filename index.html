@@ -11,7 +11,7 @@
 
 </head>
 <body>
-<div id="pda">
+    <div id="pda">
   <!-- SIDE MENU -->
   <div id="menu">
     <div class="menu-header">PDA v2.0</div>
@@ -65,542 +65,66 @@
       </div>
     </div>
   </div>
-</div>
-
-<!-- STASH FORM POPUP -->
-<div id="stashFormContainer">
-  <div class="form-header" id="formTitle">Добавить тайник</div>
-  <form id="stashForm">
-    <div class="form-group">
-      <label for="stashName">Название</label>
-      <input type="text" id="stashName" class="form-input" required>
     </div>
-    <div class="form-group">
-      <label for="stashDesc">Описание</label>
-      <textarea id="stashDesc" class="form-input"></textarea>
-    </div>
-    <div class="form-group">
-      <label for="stashType">Тип</label>
-      <select id="stashType" class="form-select">
-        <option value="stash">Тайник</option>
-        <option value="quest">Задание</option>
-        <option value="danger">Опасная зона</option>
-        <option value="anomaly">Аномалия</option>
-      </select>
-    </div>
-    <input type="hidden" id="stashLat">
-    <input type="hidden" id="stashLng">
-    <input type="hidden" id="stashId">
-    <div class="btn-group">
-      <button type="submit" class="btn btn-primary">Сохранить</button>
-      <button type="button" id="stashCancel" class="btn">Отмена</button>
-    </div>
-  </form>
-</div>
-
-<!-- STASH INFO POPUP -->
-<div id="stashPopup">
-  <div class="popup-header" id="popupName"></div>
-  <div class="popup-content">
-    <div id="popupDesc"></div>
-    <div class="popup-type" id="popupType"></div>
-    <div id="popupCoords"></div>
-  </div>
-  <div class="btn-group">
-    <button class="btn" id="popupEdit">Изменить</button>
-    <button class="btn" id="popupDelete">Удалить</button>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // === PDA MENU LOGIC ===
-  const menuButtons = document.querySelectorAll(".menu-item");
-  const sections = document.querySelectorAll(".section");
-  
-  menuButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      menuButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      sections.forEach(s => s.classList.remove("active"));
-      document.getElementById(btn.dataset.section).classList.add("active");
-    });
-  });
-
-  // === LEAFLET MAP SETUP ===
-  const map = L.map('map').setView([54.915, 33.2972], 13);
-  
-  // Normal map tiles for building visibility
-  const normalTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18
-  });
-  
-  // Dark theme for map (optional)
-  const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18
-  });
-  
-  // Add normal tiles by default
-  normalTiles.addTo(map);
-
-  // === MAP CONTROLS ===
-  let showMarkers = true;
-  let isDarkStyle = false;
-  
-  document.getElementById('toggleMapStyle').addEventListener('click', function() {
-    if (isDarkStyle) {
-      map.removeLayer(darkTiles);
-      map.addLayer(normalTiles);
-      this.textContent = 'Стиль: Здания';
-      isDarkStyle = false;
-    } else {
-      map.removeLayer(normalTiles);
-      map.addLayer(darkTiles);
-      this.textContent = 'Стиль: Темный';
-      isDarkStyle = true;
-    }
-  });
-  
-  document.getElementById('toggleMarkers').addEventListener('click', function() {
-    showMarkers = !showMarkers;
-    Object.values(markers).forEach(marker => {
-      if (showMarkers) {
-        map.addLayer(marker);
-      } else {
-        map.removeLayer(marker);
-      }
-    });
-    this.textContent = showMarkers ? 'Скрыть метки' : 'Показать метки';
-  });
-  
-  document.getElementById('centerMap').addEventListener('click', function() {
-    if (stashes.length > 0) {
-      const bounds = L.latLngBounds(stashes.map(s => [s.lat, s.lng]));
-      map.fitBounds(bounds, { padding: [50, 50] });
-    } else {
-      map.setView([54.915, 33.2972], 13);
-    }
-  });
-
-  // === CUSTOM CSS MARKERS ===
-  function createCustomIcon(type) {
-    const iconColors = {
-      stash: '#4CAF50',
-      quest: '#2196F3', 
-      danger: '#F44336',
-      anomaly: '#9C27B0'
-    };
     
-    const icons = {
-      stash: '',
-      quest: '',
-      danger: '',
-      anomaly: ''
-    };
-    
-    return L.divIcon({
-      className: 'stalker-marker',
-      html: `
-        <div style="
-          position: relative;
-          width: 40px;
-          height: 40px;
-        ">
-          <div style="
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 20px;
-            height: 20px;
-            background: ${iconColors[type] || '#4CAF50'};
-            border: 3px solid white;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 2;
-            animation: pulse 2s infinite;
-          "></div>
-          <div style="
-            position: absolute;
-            top: 0;
-            left: 20px;
-            transform: translateX(-50%);
-            font-size: 24px;
-            z-index: 1;
-            filter: drop-shadow(0 0 2px black);
-          ">${icons[type] || ''}</div>
+    <!-- STASH FORM POPUP -->
+    <div id="stashFormContainer">
+      <div class="form-header" id="formTitle">Добавить тайник</div>
+      <form id="stashForm">
+        <div class="form-group">
+          <label for="stashName">Название</label>
+          <input type="text" id="stashName" class="form-input" required>
         </div>
-      `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-  }
-
-  // Load stashes from localStorage
-  let stashes = JSON.parse(localStorage.getItem('stashes') || '[]');
-  const markers = {};
-
-  // Type translations and styles
-  const typeConfig = {
-    stash: { name: 'Тайник', class: 'type-stash' },
-    quest: { name: 'Задание', class: 'type-quest' },
-    danger: { name: 'Опасность', class: 'type-danger' },
-    anomaly: { name: 'Аномалия', class: 'type-anomaly' }
-  };
-
-  // Add stash marker to map
-  function addStashMarker(stash) {
-    const marker = L.marker([stash.lat, stash.lng], {
-      icon: createCustomIcon(stash.type)
-    });
-    
-    if (showMarkers) {
-      marker.addTo(map);
-    }
-    
-    marker.on('click', (e) => {
-      showStashPopup(stash, e.latlng);
-    });
-    
-    markers[stash.id] = marker;
-    return marker;
-  }
-
-  // Render existing stashes
-  stashes.forEach(addStashMarker);
-
-  // === MAP CLICK TO ADD STASH ===
-  let selectedLatLng = null;
-  
-  map.on('click', function(e) {
-    selectedLatLng = e.latlng;
-    document.getElementById('stashFormContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Добавить тайник';
-    document.getElementById('stashLat').value = e.latlng.lat.toFixed(6);
-    document.getElementById('stashLng').value = e.latlng.lng.toFixed(6);
-    document.getElementById('stashForm').reset();
-    document.getElementById('stashId').value = '';
-    document.getElementById('stashForm').dataset.mode = 'add';
-    
-    // Удаляем временную метку, если она есть
-    if (window.tempMarker) {
-      map.removeLayer(window.tempMarker);
-    }
-    
-    // Кастомный атрибут в стиле STALKER
-    function addStalkerAttribution() {
-      const attribution = document.createElement('div');
-      attribution.className = 'stalker-attribution';
-      attribution.innerHTML = '© OpenStreetMap';
-      document.getElementById('map').appendChild(attribution);
-    }
-
-    // Добавляем временную метку для предпросмотра
-    window.tempMarker = L.marker(e.latlng, {
-      icon: createCustomIcon('stash'),
-      opacity: 0.7
-    }).addTo(map);
-    
-    // Фокусируем карту на выбранной точке
-    map.setView(e.latlng, map.getZoom());
-  });
-
-  // Add Stash button in list view
-  document.getElementById('addStashBtn').addEventListener('click', () => {
-    // Переключаемся на карту
-    menuButtons[0].click();
-    
-    // Показываем форму
-    document.getElementById('stashFormContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Добавить тайник';
-    document.getElementById('stashForm').reset();
-    document.getElementById('stashId').value = '';
-    document.getElementById('stashForm').dataset.mode = 'add';
-    
-    // Устанавливаем координаты центра карты по умолчанию
-    const center = map.getCenter();
-    document.getElementById('stashLat').value = center.lat.toFixed(6);
-    document.getElementById('stashLng').value = center.lng.toFixed(6);
-    selectedLatLng = null;
-    
-    // Удаляем временную метку
-    if (window.tempMarker) {
-      map.removeLayer(window.tempMarker);
-      window.tempMarker = null;
-    }
-  });
-
-  // === HANDLE STASH FORM ===
-  document.getElementById('stashForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Удаляем временную метку предпросмотра
-    if (window.tempMarker) {
-      map.removeLayer(window.tempMarker);
-      window.tempMarker = null;
-    }
-    
-    const id = document.getElementById('stashId').value || 'stash_' + Date.now();
-    const lat = selectedLatLng ? selectedLatLng.lat : parseFloat(document.getElementById('stashLat').value) || map.getCenter().lat;
-    const lng = selectedLatLng ? selectedLatLng.lng : parseFloat(document.getElementById('stashLng').value) || map.getCenter().lng;
-    
-    // Валидация координат
-    if (!validateCoordinates(lat, lng)) {
-      alert('Некорректные координаты!');
-      return;
-    }
-    
-    const stash = {
-      id,
-      name: document.getElementById('stashName').value.trim(),
-      desc: document.getElementById('stashDesc').value.trim(),
-      type: document.getElementById('stashType').value,
-      lat: parseFloat(lat.toFixed(6)),
-      lng: parseFloat(lng.toFixed(6))
-    };
-
-    // Проверяем, есть ли уже тайник с таким ID
-    const index = stashes.findIndex(s => s.id === id);
-    if (index >= 0) {
-      // Обновляем существующий тайник
-      stashes[index] = stash;
-      if (markers[id]) {
-        map.removeLayer(markers[id]);
-        delete markers[id];
-      }
-      addStashMarker(stash);
-    } else {
-      // Добавляем новый тайник
-      stashes.push(stash);
-      addStashMarker(stash);
-    }
-
-    saveStashes();
-    updateStashList();
-    document.getElementById('stashFormContainer').style.display = 'none';
-    selectedLatLng = null;
-    
-    // Если мы были в режиме просмотра списка, показываем карту с новой меткой
-    if (document.getElementById('stashesSection').classList.contains('active')) {
-      menuButtons[0].click();
-    }
-    
-    // Фокусируем карту на новой метке
-    map.setView([stash.lat, stash.lng], Math.max(map.getZoom(), 15));
-  });
-
-  document.getElementById('stashCancel').addEventListener('click', () => {
-    document.getElementById('stashFormContainer').style.display = 'none';
-    if (window.tempMarker) {
-      map.removeLayer(window.tempMarker);
-      window.tempMarker = null;
-    }
-    selectedLatLng = null;
-  });
-
-  // === ВАЛИДАЦИЯ КООРДИНАТ ===
-  function validateCoordinates(lat, lng) {
-    if (isNaN(lat) || isNaN(lng)) {
-      console.error('Координаты должны быть числами:', lat, lng);
-      return false;
-    }
-    if (lat < -90 || lat > 90) {
-      console.error('Широта должна быть между -90 и 90:', lat);
-      return false;
-    }
-    if (lng < -180 || lng > 180) {
-      console.error('Долгота должна быть между -180 и 180:', lng);
-      return false;
-    }
-    return true;
-  }
-
-  // === SAVE/LOAD STASHES ===
-  function saveStashes() {
-    localStorage.setItem('stashes', JSON.stringify(stashes));
-  }
-
-  // === UPDATE STASH LIST VIEW ===
-  function updateStashList() {
-    const container = document.getElementById('stashList');
-    container.innerHTML = '';
-    
-    if (stashes.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div>Нет сохраненных тайников</div>
-          <div class="empty-hint">Нажмите на карту, чтобы добавить тайник</div>
+        <div class="form-group">
+          <label for="stashDesc">Описание</label>
+          <textarea id="stashDesc" class="form-input"></textarea>
         </div>
-      `;
-      return;
-    }
+        <div class="form-group">
+          <label for="stashType">Тип</label>
+          <select id="stashType" class="form-select">
+            <option value="stash">Тайник</option>
+            <option value="quest">Задание</option>
+            <option value="danger">Опасная зона</option>
+            <option value="anomaly">Аномалия</option>
+          </select>
+        </div>
+        <input type="hidden" id="stashLat">
+        <input type="hidden" id="stashLng">
+        <input type="hidden" id="stashId">
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+          <button type="button" id="stashCancel" class="btn">Отмена</button>
+        </div>
+      </form>
+    </div>
     
-    stashes.forEach(stash => {
-      const config = typeConfig[stash.type] || typeConfig.stash;
-      
-      const card = document.createElement('div');
-      card.className = 'stash-card';
-      card.innerHTML = `
-        <div class="stash-type ${config.class}">${config.name}</div>
-        <div class="stash-name">${stash.name}</div>
-        <div class="stash-desc">${stash.desc || 'Нет описания'}</div>
-        <div class="stash-coords">Координаты: ${stash.lat.toFixed(4)}, ${stash.lng.toFixed(4)}</div>
-      `;
-      
-      card.onclick = () => {
-        // Переключаемся на карту
-        menuButtons[0].click();
-        // Центрируем карту на тайнике
-        map.setView([stash.lat, stash.lng], Math.max(map.getZoom(), 15));
-        // Показываем попап
-        setTimeout(() => {
-          addStalkerAttribution()
-        }, 300);
-      };
-      
-      container.appendChild(card);
-    });
-  }
+    <!-- STASH INFO POPUP -->
+    <div id="stashPopup">
+      <div class="popup-header" id="popupName"></div>
+      <div class="popup-content">
+        <div id="popupDesc"></div>
+        <div class="popup-type" id="popupType"></div>
+        <div id="popupCoords"></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn" id="popupEdit">Изменить</button>
+        <button class="btn" id="popupDelete">Удалить</button>
+      </div>
+    </div>
+    
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <!-- Добавьте Supabase клиент -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Также убедитесь что у вас есть div для аутентификации (опционально) -->
+    <div id="auth-container" style="display: none;">
+      <button id="signInButton">Войти</button>
+      <button id="signOutButton" style="display: none;">Выйти</button>
+    </div>
+    
+    <script src="main.js"></script>
 
-  updateStashList();
-
-  // === STASH POPUP FUNCTIONS ===
-  const popup = document.getElementById('stashPopup');
-  
-  function showStashPopup(stash, latlng) {
-    const config = typeConfig[stash.type] || typeConfig.stash;
-    
-    document.getElementById('popupName').textContent = stash.name;
-    document.getElementById('popupDesc').textContent = stash.desc || 'Нет описания';
-    document.getElementById('popupCoords').textContent = `Координаты: ${stash.lat.toFixed(4)}, ${stash.lng.toFixed(4)}`;
-    
-    const typeElement = document.getElementById('popupType');
-    typeElement.textContent = config.name;
-    typeElement.className = `popup-type ${config.class}`;
-    
-    popup.style.display = 'block';
-    popup.dataset.stashId = stash.id;
-    
-    // Позиционируем попап рядом с меткой
-    const point = map.latLngToContainerPoint(latlng);
-    const popupWidth = popup.offsetWidth;
-    const popupHeight = popup.offsetHeight;
-    const mapRect = document.getElementById('map').getBoundingClientRect();
-    
-    // Проверяем, чтобы попап не выходил за границы карты
-    let left = point.x - popupWidth / 2;
-    let top = point.y - popupHeight - 20;
-    
-    // Корректируем позицию, если попап выходит за границы
-    if (left < 10) left = 10;
-    if (left + popupWidth > mapRect.width - 10) left = mapRect.width - popupWidth - 10;
-    if (top < 10) top = point.y + 20; // Показываем под меткой, если сверху не хватает места
-    
-    popup.style.left = left + 'px';
-    popup.style.top = top + 'px';
-  }
-
-  // Popup button handlers
-  document.getElementById('popupEdit').addEventListener('click', function() {
-    const stashId = popup.dataset.stashId;
-    const stash = stashes.find(s => s.id === stashId);
-    
-    if (stash) {
-      document.getElementById('stashFormContainer').style.display = 'block';
-      document.getElementById('formTitle').textContent = 'Изменить тайник';
-      document.getElementById('stashName').value = stash.name;
-      document.getElementById('stashDesc').value = stash.desc;
-      document.getElementById('stashType').value = stash.type;
-      document.getElementById('stashLat').value = stash.lat;
-      document.getElementById('stashLng').value = stash.lng;
-      document.getElementById('stashId').value = stash.id;
-      document.getElementById('stashForm').dataset.mode = 'edit';
-      
-      // Устанавливаем выбранные координаты
-      selectedLatLng = L.latLng(stash.lat, stash.lng);
-      
-      popup.style.display = 'none';
-    }
-  }); 
-
-  document.getElementById('popupDelete').addEventListener('click', function() {
-    const stashId = popup.dataset.stashId;
-    
-    if (confirm('Удалить этот тайник?')) {
-      const index = stashes.findIndex(s => s.id === stashId);
-      if (index >= 0) {
-        if (markers[stashId]) {
-          map.removeLayer(markers[stashId]);
-          delete markers[stashId];
-        }
-        stashes.splice(index, 1);
-        saveStashes();
-        updateStashList();
-      }
-    }
-    popup.style.display = 'none';
-  });
-
-  // Hide popup when clicking on map
-  map.on('click', (e) => {
-    // Не скрываем попап, если клик был по самой метке
-    if (!e.originalEvent.target.closest('.stalker-marker')) {
-      popup.style.display = 'none';
-    }
-  });
-
-  // Hide popup when clicking outside
-  document.addEventListener('click', (e) => {
-    if (popup.style.display === 'block' && 
-        !popup.contains(e.target) && 
-        !e.target.closest('.stalker-marker')) {
-      popup.style.display = 'none';
-    }
-  });
-
-  // Добавляем стили для анимации меток
-  const style = document.createElement('style');
-  style.textContent = `
-    /* Стили для состояния "пусто" */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 40px;
-      color: #888;
-      font-size: 16px;
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    
-    .empty-hint {
-      font-size: 14px;
-      margin-top: 10px;
-      color: #666;
-    }
-    
-    @keyframes pulse {
-      0% { 
-        transform: translate(-50%, -50%) scale(1); 
-        opacity: 1; 
-      }
-      50% { 
-        transform: translate(-50%, -50%) scale(1.1); 
-        opacity: 0.8; 
-      }
-      100% { 
-        transform: translate(-50%, -50%) scale(1); 
-        opacity: 1; 
-      }
-    }
-  `;
-  document.head.appendChild(style);
-
-  // Инициализация завершена
-  console.log('S.T.A.L.K.E.R. PDA v2.0 initialized');
-</script>
 </body>
 </html>

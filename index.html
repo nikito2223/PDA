@@ -112,155 +112,495 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-/* ================= SUPABASE ================= */
-
-const SUPABASE_URL = "https://jezvycdhlfrjitqydhur.supabase.co";
-const SUPABASE_KEY = "sb_publishable_DL_SkwBCIrHB0f7oIhwWAA_r7B2VMut";
-
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* ================= PDA MENU ================= */
-
-const menuButtons = document.querySelectorAll(".menu-item");
-const sections = document.querySelectorAll(".section");
-
-menuButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    menuButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    sections.forEach(s => s.classList.remove("active"));
-    document.getElementById(btn.dataset.section).classList.add("active");
+  // === PDA MENU LOGIC ===
+  const menuButtons = document.querySelectorAll(".menu-item");
+  const sections = document.querySelectorAll(".section");
+  
+  menuButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      menuButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sections.forEach(s => s.classList.remove("active"));
+      document.getElementById(btn.dataset.section).classList.add("active");
+    });
   });
-});
 
-/* ================= MAP ================= */
-
-const map = L.map('map').setView([54.915, 33.2972], 13);
-
-const normalTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 });
-const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 });
-
-normalTiles.addTo(map);
-
-let isDarkStyle = false;
-let showMarkers = true;
-
-document.getElementById('toggleMapStyle').onclick = () => {
-  map.removeLayer(isDarkStyle ? darkTiles : normalTiles);
-  map.addLayer(isDarkStyle ? normalTiles : darkTiles);
-  isDarkStyle = !isDarkStyle;
-};
-
-document.getElementById('toggleMarkers').onclick = () => {
-  showMarkers = !showMarkers;
-  Object.values(markers).forEach(m => showMarkers ? map.addLayer(m) : map.removeLayer(m));
-};
-
-document.getElementById('centerMap').onclick = () => {
-  if (!stashes.length) return;
-  map.fitBounds(stashes.map(s => [s.lat, s.lng]), { padding: [50, 50] });
-};
-
-/* ================= DATA ================= */
-
-let stashes = [];
-const markers = {};
-let selectedLatLng = null;
-
-/* ================= LOAD ================= */
-
-async function loadStashes() {
-  const { data, error } = await supabase.from('stashes').select('*');
-  if (error) return console.error(error);
-
-  stashes = data;
-  stashes.forEach(addStashMarker);
-  updateStashList();
-}
-
-loadStashes();
-
-/* ================= MARKERS ================= */
-
-function createCustomIcon(type) {
-  const colors = { stash:'#4CAF50', quest:'#2196F3', danger:'#F44336', anomaly:'#9C27B0' };
-  return L.divIcon({
-    className: 'stalker-marker',
-    html: `<div style="width:20px;height:20px;border-radius:50%;background:${colors[type]||'#4CAF50'}"></div>`,
-    iconSize: [20,20]
+  // === LEAFLET MAP SETUP ===
+  const map = L.map('map').setView([54.915, 33.2972], 13);
+  
+  // Normal map tiles for building visibility
+  const normalTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
   });
-}
+  
+  // Dark theme for map (optional)
+  const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
+  });
+  
+  // Add normal tiles by default
+  normalTiles.addTo(map);
 
-function addStashMarker(stash) {
-  const marker = L.marker([stash.lat, stash.lng], { icon: createCustomIcon(stash.type) });
-  if (showMarkers) marker.addTo(map);
-  marker.on('click', e => showStashPopup(stash, e.latlng));
-  markers[stash.id] = marker;
-}
+  // === MAP CONTROLS ===
+  let showMarkers = true;
+  let isDarkStyle = false;
+  
+  document.getElementById('toggleMapStyle').addEventListener('click', function() {
+    if (isDarkStyle) {
+      map.removeLayer(darkTiles);
+      map.addLayer(normalTiles);
+      this.textContent = 'Стиль: Здания';
+      isDarkStyle = false;
+    } else {
+      map.removeLayer(normalTiles);
+      map.addLayer(darkTiles);
+      this.textContent = 'Стиль: Темный';
+      isDarkStyle = true;
+    }
+  });
+  
+  document.getElementById('toggleMarkers').addEventListener('click', function() {
+    showMarkers = !showMarkers;
+    Object.values(markers).forEach(marker => {
+      if (showMarkers) {
+        map.addLayer(marker);
+      } else {
+        map.removeLayer(marker);
+      }
+    });
+    this.textContent = showMarkers ? 'Скрыть метки' : 'Показать метки';
+  });
+  
+  document.getElementById('centerMap').addEventListener('click', function() {
+    if (stashes.length > 0) {
+      const bounds = L.latLngBounds(stashes.map(s => [s.lat, s.lng]));
+      map.fitBounds(bounds, { padding: [50, 50] });
+    } else {
+      map.setView([54.915, 33.2972], 13);
+    }
+  });
 
-/* ================= MAP CLICK ================= */
+  // === CUSTOM CSS MARKERS ===
+  function createCustomIcon(type) {
+    const iconColors = {
+      stash: '#4CAF50',
+      quest: '#2196F3', 
+      danger: '#F44336',
+      anomaly: '#9C27B0'
+    };
+    
+    const icons = {
+      stash: '',
+      quest: '',
+      danger: '',
+      anomaly: ''
+    };
+    
+    return L.divIcon({
+      className: 'stalker-marker',
+      html: `
+        <div style="
+          position: relative;
+          width: 40px;
+          height: 40px;
+        ">
+          <div style="
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            background: ${iconColors[type] || '#4CAF50'};
+            border: 3px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 2;
+            animation: pulse 2s infinite;
+          "></div>
+          <div style="
+            position: absolute;
+            top: 0;
+            left: 20px;
+            transform: translateX(-50%);
+            font-size: 24px;
+            z-index: 1;
+            filter: drop-shadow(0 0 2px black);
+          ">${icons[type] || ''}</div>
+        </div>
+      `,
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40]
+    });
+  }
 
-map.on('click', e => {
-  selectedLatLng = e.latlng;
-  stashFormContainer.style.display = 'block';
-  stashLat.value = e.latlng.lat;
-  stashLng.value = e.latlng.lng;
-  stashId.value = '';
-});
+  // Load stashes from localStorage
+  let stashes = JSON.parse(localStorage.getItem('stashes') || '[]');
+  const markers = {};
 
-/* ================= SAVE ================= */
-
-document.getElementById('stashForm').onsubmit = async e => {
-  e.preventDefault();
-
-  const stash = {
-    id: stashId.value || 'stash_' + Date.now(),
-    name: stashName.value,
-    description: stashDesc.value,
-    type: stashType.value,
-    lat: selectedLatLng.lat,
-    lng: selectedLatLng.lng
+  // Type translations and styles
+  const typeConfig = {
+    stash: { name: 'Тайник', class: 'type-stash' },
+    quest: { name: 'Задание', class: 'type-quest' },
+    danger: { name: 'Опасность', class: 'type-danger' },
+    anomaly: { name: 'Аномалия', class: 'type-anomaly' }
   };
 
-  await supabase.from('stashes').upsert(stash);
-  location.reload();
-};
+  // Add stash marker to map
+  function addStashMarker(stash) {
+    const marker = L.marker([stash.lat, stash.lng], {
+      icon: createCustomIcon(stash.type)
+    });
+    
+    if (showMarkers) {
+      marker.addTo(map);
+    }
+    
+    marker.on('click', (e) => {
+      showStashPopup(stash, e.latlng);
+    });
+    
+    markers[stash.id] = marker;
+    return marker;
+  }
 
-/* ================= DELETE ================= */
+  // Render existing stashes
+  stashes.forEach(addStashMarker);
 
-document.getElementById('popupDelete').onclick = async () => {
-  await supabase.from('stashes').delete().eq('id', stashPopup.dataset.stashId);
-  location.reload();
-};
+  // === MAP CLICK TO ADD STASH ===
+  let selectedLatLng = null;
+  
+  map.on('click', function(e) {
+    selectedLatLng = e.latlng;
+    document.getElementById('stashFormContainer').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Добавить тайник';
+    document.getElementById('stashLat').value = e.latlng.lat.toFixed(6);
+    document.getElementById('stashLng').value = e.latlng.lng.toFixed(6);
+    document.getElementById('stashForm').reset();
+    document.getElementById('stashId').value = '';
+    document.getElementById('stashForm').dataset.mode = 'add';
+    
+    // Удаляем временную метку, если она есть
+    if (window.tempMarker) {
+      map.removeLayer(window.tempMarker);
+    }
+    
+    // Кастомный атрибут в стиле STALKER
+    function addStalkerAttribution() {
+      const attribution = document.createElement('div');
+      attribution.className = 'stalker-attribution';
+      attribution.innerHTML = '© OpenStreetMap';
+      document.getElementById('map').appendChild(attribution);
+    }
 
-/* ================= LIST ================= */
-
-function updateStashList() {
-  stashList.innerHTML = '';
-  stashes.forEach(s => {
-    const d = document.createElement('div');
-    d.className = 'stash-card';
-    d.innerHTML = `<div>${s.name}</div><div>${s.description || ''}</div>`;
-    d.onclick = () => map.setView([s.lat, s.lng], 16);
-    stashList.appendChild(d);
+    // Добавляем временную метку для предпросмотра
+    window.tempMarker = L.marker(e.latlng, {
+      icon: createCustomIcon('stash'),
+      opacity: 0.7
+    }).addTo(map);
+    
+    // Фокусируем карту на выбранной точке
+    map.setView(e.latlng, map.getZoom());
   });
-}
 
-/* ================= POPUP ================= */
+  // Add Stash button in list view
+  document.getElementById('addStashBtn').addEventListener('click', () => {
+    // Переключаемся на карту
+    menuButtons[0].click();
+    
+    // Показываем форму
+    document.getElementById('stashFormContainer').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Добавить тайник';
+    document.getElementById('stashForm').reset();
+    document.getElementById('stashId').value = '';
+    document.getElementById('stashForm').dataset.mode = 'add';
+    
+    // Устанавливаем координаты центра карты по умолчанию
+    const center = map.getCenter();
+    document.getElementById('stashLat').value = center.lat.toFixed(6);
+    document.getElementById('stashLng').value = center.lng.toFixed(6);
+    selectedLatLng = null;
+    
+    // Удаляем временную метку
+    if (window.tempMarker) {
+      map.removeLayer(window.tempMarker);
+      window.tempMarker = null;
+    }
+  });
 
-function showStashPopup(stash, latlng) {
-  popupName.textContent = stash.name;
-  popupDesc.textContent = stash.description || '';
-  popupCoords.textContent = `${stash.lat}, ${stash.lng}`;
-  stashPopup.dataset.stashId = stash.id;
-  stashPopup.style.display = 'block';
-}
+  // === HANDLE STASH FORM ===
+  document.getElementById('stashForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Удаляем временную метку предпросмотра
+    if (window.tempMarker) {
+      map.removeLayer(window.tempMarker);
+      window.tempMarker = null;
+    }
+    
+    const id = document.getElementById('stashId').value || 'stash_' + Date.now();
+    const lat = selectedLatLng ? selectedLatLng.lat : parseFloat(document.getElementById('stashLat').value) || map.getCenter().lat;
+    const lng = selectedLatLng ? selectedLatLng.lng : parseFloat(document.getElementById('stashLng').value) || map.getCenter().lng;
+    
+    // Валидация координат
+    if (!validateCoordinates(lat, lng)) {
+      alert('Некорректные координаты!');
+      return;
+    }
+    
+    const stash = {
+      id,
+      name: document.getElementById('stashName').value.trim(),
+      desc: document.getElementById('stashDesc').value.trim(),
+      type: document.getElementById('stashType').value,
+      lat: parseFloat(lat.toFixed(6)),
+      lng: parseFloat(lng.toFixed(6))
+    };
 
-console.log('S.T.A.L.K.E.R PDA with Supabase initialized');
-</script>
+    // Проверяем, есть ли уже тайник с таким ID
+    const index = stashes.findIndex(s => s.id === id);
+    if (index >= 0) {
+      // Обновляем существующий тайник
+      stashes[index] = stash;
+      if (markers[id]) {
+        map.removeLayer(markers[id]);
+        delete markers[id];
+      }
+      addStashMarker(stash);
+    } else {
+      // Добавляем новый тайник
+      stashes.push(stash);
+      addStashMarker(stash);
+    }
 
+    saveStashes();
+    updateStashList();
+    document.getElementById('stashFormContainer').style.display = 'none';
+    selectedLatLng = null;
+    
+    // Если мы были в режиме просмотра списка, показываем карту с новой меткой
+    if (document.getElementById('stashesSection').classList.contains('active')) {
+      menuButtons[0].click();
+    }
+    
+    // Фокусируем карту на новой метке
+    map.setView([stash.lat, stash.lng], Math.max(map.getZoom(), 15));
+  });
+
+  document.getElementById('stashCancel').addEventListener('click', () => {
+    document.getElementById('stashFormContainer').style.display = 'none';
+    if (window.tempMarker) {
+      map.removeLayer(window.tempMarker);
+      window.tempMarker = null;
+    }
+    selectedLatLng = null;
+  });
+
+  // === ВАЛИДАЦИЯ КООРДИНАТ ===
+  function validateCoordinates(lat, lng) {
+    if (isNaN(lat) || isNaN(lng)) {
+      console.error('Координаты должны быть числами:', lat, lng);
+      return false;
+    }
+    if (lat < -90 || lat > 90) {
+      console.error('Широта должна быть между -90 и 90:', lat);
+      return false;
+    }
+    if (lng < -180 || lng > 180) {
+      console.error('Долгота должна быть между -180 и 180:', lng);
+      return false;
+    }
+    return true;
+  }
+
+  // === SAVE/LOAD STASHES ===
+  function saveStashes() {
+    localStorage.setItem('stashes', JSON.stringify(stashes));
+  }
+
+  // === UPDATE STASH LIST VIEW ===
+  function updateStashList() {
+    const container = document.getElementById('stashList');
+    container.innerHTML = '';
+    
+    if (stashes.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div>Нет сохраненных тайников</div>
+          <div class="empty-hint">Нажмите на карту, чтобы добавить тайник</div>
+        </div>
+      `;
+      return;
+    }
+    
+    stashes.forEach(stash => {
+      const config = typeConfig[stash.type] || typeConfig.stash;
+      
+      const card = document.createElement('div');
+      card.className = 'stash-card';
+      card.innerHTML = `
+        <div class="stash-type ${config.class}">${config.name}</div>
+        <div class="stash-name">${stash.name}</div>
+        <div class="stash-desc">${stash.desc || 'Нет описания'}</div>
+        <div class="stash-coords">Координаты: ${stash.lat.toFixed(4)}, ${stash.lng.toFixed(4)}</div>
+      `;
+      
+      card.onclick = () => {
+        // Переключаемся на карту
+        menuButtons[0].click();
+        // Центрируем карту на тайнике
+        map.setView([stash.lat, stash.lng], Math.max(map.getZoom(), 15));
+        // Показываем попап
+        setTimeout(() => {
+          addStalkerAttribution()
+        }, 300);
+      };
+      
+      container.appendChild(card);
+    });
+  }
+
+  updateStashList();
+
+  // === STASH POPUP FUNCTIONS ===
+  const popup = document.getElementById('stashPopup');
+  
+  function showStashPopup(stash, latlng) {
+    const config = typeConfig[stash.type] || typeConfig.stash;
+    
+    document.getElementById('popupName').textContent = stash.name;
+    document.getElementById('popupDesc').textContent = stash.desc || 'Нет описания';
+    document.getElementById('popupCoords').textContent = `Координаты: ${stash.lat.toFixed(4)}, ${stash.lng.toFixed(4)}`;
+    
+    const typeElement = document.getElementById('popupType');
+    typeElement.textContent = config.name;
+    typeElement.className = `popup-type ${config.class}`;
+    
+    popup.style.display = 'block';
+    popup.dataset.stashId = stash.id;
+    
+    // Позиционируем попап рядом с меткой
+    const point = map.latLngToContainerPoint(latlng);
+    const popupWidth = popup.offsetWidth;
+    const popupHeight = popup.offsetHeight;
+    const mapRect = document.getElementById('map').getBoundingClientRect();
+    
+    // Проверяем, чтобы попап не выходил за границы карты
+    let left = point.x - popupWidth / 2;
+    let top = point.y - popupHeight - 20;
+    
+    // Корректируем позицию, если попап выходит за границы
+    if (left < 10) left = 10;
+    if (left + popupWidth > mapRect.width - 10) left = mapRect.width - popupWidth - 10;
+    if (top < 10) top = point.y + 20; // Показываем под меткой, если сверху не хватает места
+    
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  }
+
+  // Popup button handlers
+  document.getElementById('popupEdit').addEventListener('click', function() {
+    const stashId = popup.dataset.stashId;
+    const stash = stashes.find(s => s.id === stashId);
+    
+    if (stash) {
+      document.getElementById('stashFormContainer').style.display = 'block';
+      document.getElementById('formTitle').textContent = 'Изменить тайник';
+      document.getElementById('stashName').value = stash.name;
+      document.getElementById('stashDesc').value = stash.desc;
+      document.getElementById('stashType').value = stash.type;
+      document.getElementById('stashLat').value = stash.lat;
+      document.getElementById('stashLng').value = stash.lng;
+      document.getElementById('stashId').value = stash.id;
+      document.getElementById('stashForm').dataset.mode = 'edit';
+      
+      // Устанавливаем выбранные координаты
+      selectedLatLng = L.latLng(stash.lat, stash.lng);
+      
+      popup.style.display = 'none';
+    }
+  }); 
+
+  document.getElementById('popupDelete').addEventListener('click', function() {
+    const stashId = popup.dataset.stashId;
+    
+    if (confirm('Удалить этот тайник?')) {
+      const index = stashes.findIndex(s => s.id === stashId);
+      if (index >= 0) {
+        if (markers[stashId]) {
+          map.removeLayer(markers[stashId]);
+          delete markers[stashId];
+        }
+        stashes.splice(index, 1);
+        saveStashes();
+        updateStashList();
+      }
+    }
+    popup.style.display = 'none';
+  });
+
+  // Hide popup when clicking on map
+  map.on('click', (e) => {
+    // Не скрываем попап, если клик был по самой метке
+    if (!e.originalEvent.target.closest('.stalker-marker')) {
+      popup.style.display = 'none';
+    }
+  });
+
+  // Hide popup when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup.style.display === 'block' && 
+        !popup.contains(e.target) && 
+        !e.target.closest('.stalker-marker')) {
+      popup.style.display = 'none';
+    }
+  });
+
+  // Добавляем стили для анимации меток
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Стили для состояния "пусто" */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #888;
+      font-size: 16px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .empty-hint {
+      font-size: 14px;
+      margin-top: 10px;
+      color: #666;
+    }
+    
+    @keyframes pulse {
+      0% { 
+        transform: translate(-50%, -50%) scale(1); 
+        opacity: 1; 
+      }
+      50% { 
+        transform: translate(-50%, -50%) scale(1.1); 
+        opacity: 0.8; 
+      }
+      100% { 
+        transform: translate(-50%, -50%) scale(1); 
+        opacity: 1; 
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Инициализация завершена
+  console.log('S.T.A.L.K.E.R. PDA v2.0 initialized');
 </script>
 </body>
 </html>

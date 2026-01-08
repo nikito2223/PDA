@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.T.A.L.K.E.R. PDA v2.0</title>
+<link rel="stylesheet" href="style.css">
+<!-- Leaflet.js for map rendering -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+
+</head>
+<body>
+<div id="pda">
+  <!-- SIDE MENU -->
+  <div id="menu">
+    <div class="menu-header">PDA v2.0</div>
+    <button class="menu-item active" data-section="mapSection">Карта</button>
+    <button class="menu-item" data-section="stashesSection">Тайники</button>
+    <button class="menu-item" data-section="journalSection">Дневник</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+    <!-- MAP SECTION -->
+    <div id="mapSection" class="section active">
+      <div id="map"></div>
+      <!-- MAP CONTROLS -->
+      <div class="map-controls">
+        <button class="map-control-btn" id="toggleMapStyle">Стиль: Здания</button>
+        <button class="map-control-btn" id="toggleMarkers">Показать метки</button>
+        <button class="map-control-btn" id="centerMap">Центрировать</button>
+      </div>
+    </div>
+
+    <!-- STASHES SECTION -->
+    <div id="stashesSection" class="section">
+      <div class="stash-list-header">
+        <div class="stash-list-title">ТАЙНИКИ ЗОНЫ</div>
+        <button class="btn" id="addStashBtn">+ Добавить тайник</button>
+      </div>
+      <div class="stash-grid" id="stashList">
+        <!-- Stash cards will be added here -->
+      </div>
+    </div>
+
+    <!-- JOURNAL SECTION -->
+    <div id="journalSection" class="section">
+      <div class="stash-list-header">
+        <div class="stash-list-title">ДНЕВНИК СТАЛКЕРА</div>
+      </div>
+      <div id="journalContent">
+        <div class="journal-entry">
+          <div class="journal-date">12.08.2023 - 14:30</div>
+          <div>Обнаружил аномалию "Жарка" у заброшенной фермы. Будьте осторожны, братья.</div>
+        </div>
+        <div class="journal-entry">
+          <div class="journal-date">11.08.2023 - 09:15</div>
+          <div>Схрон с припасами в подвале разрушенного сарая в Кордоне пополнен.</div>
+        </div>
+        <div class="journal-entry">
+          <div class="journal-date">10.08.2023 - 16:45</div>
+          <div>Мутанты активизировались около свалки. Нужно проверить старые тайники.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STASH FORM POPUP -->
+<div id="stashFormContainer">
+  <div class="form-header" id="formTitle">Добавить тайник</div>
+  <form id="stashForm">
+    <div class="form-group">
+      <label for="stashName">Название</label>
+      <input type="text" id="stashName" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label for="stashDesc">Описание</label>
+      <textarea id="stashDesc" class="form-input"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="stashType">Тип</label>
+      <select id="stashType" class="form-select">
+        <option value="stash">Тайник</option>
+        <option value="quest">Задание</option>
+        <option value="danger">Опасная зона</option>
+        <option value="anomaly">Аномалия</option>
+      </select>
+    </div>
+    <input type="hidden" id="stashLat">
+    <input type="hidden" id="stashLng">
+    <input type="hidden" id="stashId">
+    <div class="btn-group">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      <button type="button" id="stashCancel" class="btn">Отмена</button>
+    </div>
+  </form>
+</div>
+
+<!-- STASH INFO POPUP -->
+<div id="stashPopup">
+  <div class="popup-header" id="popupName"></div>
+  <div class="popup-content">
+    <div id="popupDesc"></div>
+    <div class="popup-type" id="popupType"></div>
+    <div id="popupCoords"></div>
+  </div>
+  <div class="btn-group">
+    <button class="btn" id="popupEdit">Изменить</button>
+    <button class="btn" id="popupDelete">Удалить</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* ================= SUPABASE ================= */
+
+const SUPABASE_URL = "https://jezvycdhlfrjitqydhur.supabase.co";
+const SUPABASE_KEY = "sb_publishable_DL_SkwBCIrHB0f7oIhwWAA_r7B2VMut";
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ================= PDA MENU ================= */
+
+const menuButtons = document.querySelectorAll(".menu-item");
+const sections = document.querySelectorAll(".section");
+
+menuButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    menuButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    sections.forEach(s => s.classList.remove("active"));
+    document.getElementById(btn.dataset.section).classList.add("active");
+  });
+});
+
+/* ================= MAP ================= */
+
+const map = L.map('map').setView([54.915, 33.2972], 13);
+
+const normalTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 });
+const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 });
+
+normalTiles.addTo(map);
+
+let isDarkStyle = false;
+let showMarkers = true;
+
+document.getElementById('toggleMapStyle').onclick = () => {
+  map.removeLayer(isDarkStyle ? darkTiles : normalTiles);
+  map.addLayer(isDarkStyle ? normalTiles : darkTiles);
+  isDarkStyle = !isDarkStyle;
+};
+
+document.getElementById('toggleMarkers').onclick = () => {
+  showMarkers = !showMarkers;
+  Object.values(markers).forEach(m => showMarkers ? map.addLayer(m) : map.removeLayer(m));
+};
+
+document.getElementById('centerMap').onclick = () => {
+  if (!stashes.length) return;
+  map.fitBounds(stashes.map(s => [s.lat, s.lng]), { padding: [50, 50] });
+};
+
+/* ================= DATA ================= */
+
+let stashes = [];
+const markers = {};
+let selectedLatLng = null;
+
+/* ================= LOAD ================= */
+
+async function loadStashes() {
+  const { data, error } = await supabase.from('stashes').select('*');
+  if (error) return console.error(error);
+
+  stashes = data;
+  stashes.forEach(addStashMarker);
+  updateStashList();
+}
+
+loadStashes();
+
+/* ================= MARKERS ================= */
+
+function createCustomIcon(type) {
+  const colors = { stash:'#4CAF50', quest:'#2196F3', danger:'#F44336', anomaly:'#9C27B0' };
+  return L.divIcon({
+    className: 'stalker-marker',
+    html: `<div style="width:20px;height:20px;border-radius:50%;background:${colors[type]||'#4CAF50'}"></div>`,
+    iconSize: [20,20]
+  });
+}
+
+function addStashMarker(stash) {
+  const marker = L.marker([stash.lat, stash.lng], { icon: createCustomIcon(stash.type) });
+  if (showMarkers) marker.addTo(map);
+  marker.on('click', e => showStashPopup(stash, e.latlng));
+  markers[stash.id] = marker;
+}
+
+/* ================= MAP CLICK ================= */
+
+map.on('click', e => {
+  selectedLatLng = e.latlng;
+  stashFormContainer.style.display = 'block';
+  stashLat.value = e.latlng.lat;
+  stashLng.value = e.latlng.lng;
+  stashId.value = '';
+});
+
+/* ================= SAVE ================= */
+
+document.getElementById('stashForm').onsubmit = async e => {
+  e.preventDefault();
+
+  const stash = {
+    id: stashId.value || 'stash_' + Date.now(),
+    name: stashName.value,
+    description: stashDesc.value,
+    type: stashType.value,
+    lat: selectedLatLng.lat,
+    lng: selectedLatLng.lng
+  };
+
+  await supabase.from('stashes').upsert(stash);
+  location.reload();
+};
+
+/* ================= DELETE ================= */
+
+document.getElementById('popupDelete').onclick = async () => {
+  await supabase.from('stashes').delete().eq('id', stashPopup.dataset.stashId);
+  location.reload();
+};
+
+/* ================= LIST ================= */
+
+function updateStashList() {
+  stashList.innerHTML = '';
+  stashes.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'stash-card';
+    d.innerHTML = `<div>${s.name}</div><div>${s.description || ''}</div>`;
+    d.onclick = () => map.setView([s.lat, s.lng], 16);
+    stashList.appendChild(d);
+  });
+}
+
+/* ================= POPUP ================= */
+
+function showStashPopup(stash, latlng) {
+  popupName.textContent = stash.name;
+  popupDesc.textContent = stash.description || '';
+  popupCoords.textContent = `${stash.lat}, ${stash.lng}`;
+  stashPopup.dataset.stashId = stash.id;
+  stashPopup.style.display = 'block';
+}
+
+console.log('S.T.A.L.K.E.R PDA with Supabase initialized');
+</script>
+
+</script>
+</body>
+</html>

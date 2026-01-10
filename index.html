@@ -12,61 +12,96 @@
 </head>
 <body>
     <div id="pda">
-  <!-- SIDE MENU -->
-  <div id="menu">
-    <div class="menu-header">PDA v2.0</div>
-    <button class="menu-item active" data-section="mapSection">Карта</button>
-    <button class="menu-item" data-section="stashesSection">Тайники</button>
-    <button class="menu-item" data-section="journalSection">Дневник</button>
-  </div>
+        <!-- SIDE MENU -->
+        <div id="menu">
+          <div class="menu-header">PDA v2.0</div>
+          <button class="menu-item active" data-section="mapSection">Карта</button>
+          <button class="menu-item" data-section="stashesSection">Тайники</button>
+          <button class="menu-item" data-section="journalSection">Дневник</button>
 
-  <!-- MAIN CONTENT -->
-  <div id="content">
-    <!-- MAP SECTION -->
-    <div id="mapSection" class="section active">
-      <div id="map"></div>
-      <!-- MAP CONTROLS -->
-      <div class="map-controls">
-        <button class="map-control-btn" id="toggleMapStyle">Стиль: Здания</button>
-        <button class="map-control-btn" id="toggleMarkers">Показать метки</button>
-        <button class="map-control-btn" id="centerMap">Центрировать</button>
-      </div>
-    </div>
+        </div>
+        
+        <!-- MAIN CONTENT -->
+        <div id="content">
+          <!-- MAP SECTION -->
+          <div id="mapSection" class="section active">
+            <div id="map"></div>
+            <!-- MAP CONTROLS -->
+            <div class="map-controls">
+              <button class="map-control-btn" id="toggleMapStyle">Стиль: Здания</button>
+              <button class="map-control-btn" id="toggleMarkers">Показать метки</button>
+              <button class="map-control-btn" id="centerMap">Центрировать</button>
+              <button class="map-control-btn" id="toggleNavMode">
+                Режим: СОЗДАНИЕ
+              </button>
 
-    <!-- STASHES SECTION -->
-    <div id="stashesSection" class="section">
-      <div class="stash-list-header">
-        <div class="stash-list-title">ТАЙНИКИ ЗОНЫ</div>
-        <button class="btn" id="addStashBtn">+ Добавить тайник</button>
-      </div>
-      <div class="stash-grid" id="stashList">
-        <!-- Stash cards will be added here -->
-      </div>
-    </div>
-
-    <!-- JOURNAL SECTION -->
-    <div id="journalSection" class="section">
-      <div class="stash-list-header">
-        <div class="stash-list-title">ДНЕВНИК СТАЛКЕРА</div>
-      </div>
-      <div id="journalContent">
-        <div class="journal-entry">
-          <div class="journal-date">12.08.2023 - 14:30</div>
-          <div>Обнаружил аномалию "Жарка" у заброшенной фермы. Будьте осторожны, братья.</div>
+            </div>
+          </div>
+        
+          <!-- STASHES SECTION -->
+          <div id="stashesSection" class="section">
+            <div class="stash-list-header">
+              <div class="stash-list-title">ТАЙНИКИ ЗОНЫ</div>
+              <button class="btn" id="addStashBtn">+ Добавить тайник</button>
+            </div>
+            <div class="stash-grid" id="stashList">
+              <!-- Stash cards will be added here -->
+            </div>
+          </div>
+        
+          <!-- JOURNAL SECTION -->
+          <div id="journalSection" class="section">
+            <div class="stash-list-header">
+              <div class="stash-list-title">ДНЕВНИК СТАЛКЕРА</div>
+            </div>
+            <div id="journalContent">
+              <div class="journal-entry">
+                <div class="journal-date">12.08.2023 - 14:30</div>
+                <div>Обнаружил аномалию "Жарка" у заброшенной фермы. Будьте осторожны, братья.</div>
+              </div>
+              <div class="journal-entry">
+                <div class="journal-date">11.08.2023 - 09:15</div>
+                <div>Схрон с припасами в подвале разрушенного сарая в Кордоне пополнен.</div>
+              </div>
+              <div class="journal-entry">
+                <div class="journal-date">10.08.2023 - 16:45</div>
+                <div>Мутанты активизировались около свалки. Нужно проверить старые тайники.</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="journal-entry">
-          <div class="journal-date">11.08.2023 - 09:15</div>
-          <div>Схрон с припасами в подвале разрушенного сарая в Кордоне пополнен.</div>
-        </div>
-        <div class="journal-entry">
-          <div class="journal-date">10.08.2023 - 16:45</div>
-          <div>Мутанты активизировались около свалки. Нужно проверить старые тайники.</div>
-        </div>
-      </div>
-    </div>
-  </div>
     </div>
     
+    <!-- GPS кнопка -->
+    <div id="myPositionBtn" class="gps-button">
+      <div class="gps-icon">⌖</div>
+      <div class="gps-text">Позиция</div>
+    </div>
+    
+    <!-- Панель навигации -->
+    <div id="navigationPanel">
+      <div class="navigation-header">
+        <div id="navTitle">Навигация</div>
+        <button id="closeNav" class="btn-small">×</button>
+      </div>
+      <div class="nav-content">
+        <div class="nav-info">
+          <div>Дистанция: <span id="navDistance">-</span></div>
+          <div>Время: <span id="navTime">-</span></div>
+          <div>Статус: <span id="navStatus">Ожидание</span></div>
+        </div>
+        <button id="startNavigation" class="btn btn-primary">СТАРТ</button>
+        <button id="stopNavigation" class="btn">СТОП</button>
+      </div>
+    </div>
+
+    
+    <!-- Статус навигации -->
+    <div id="navStatusBar" class="nav-status">
+      <span id="statusText">Навигация активна</span>
+      <span id="statusDistance"> - 0.0 км</span>
+    </div>
+
     <!-- STASH FORM POPUP -->
     <div id="stashFormContainer">
       <div class="form-header" id="formTitle">Добавить тайник</div>
@@ -112,7 +147,7 @@
       </div>
     </div>
     
-    <!-- Leaflet -->
+
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     
     <!-- Добавьте Supabase клиент -->
@@ -123,6 +158,18 @@
       <button id="signInButton">Войти</button>
       <button id="signOutButton" style="display: none;">Выйти</button>
     </div>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <!-- ORS plugin -->
+    <script src="https://unpkg.com/leaflet-routing-openrouteservice/leaflet-routing-openrouteservice.js"></script>
+
+
+
     
     <script src="main.js"></script>
 

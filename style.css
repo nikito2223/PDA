@@ -1,11 +1,15 @@
 /* === ROOT VARIABLES === */
 :root {
   --stalker-green: #0f0;
+  --stalker-green-glow: rgba(0, 255, 0, 0.7);
   --stalker-dark: #0a0a0a;
   --stalker-gray: #1a1a1a;
   --stalker-border: #0f0;
   --stalker-glow: 0 0 10px #0f0, 0 0 20px #0f0;
   --stalker-text-glow: 0 0 5px #0f0;
+  --stalker-red: #f00;
+  --stalker-yellow: #ff0;
+  --stalker-orange: #ff8000;
 }
 
 /* === RESET & BASE === */
@@ -15,13 +19,21 @@
   box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Courier New', monospace;
   background: var(--stalker-dark);
   color: var(--stalker-green);
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /* === SCAN LINES EFFECT === */
@@ -41,6 +53,12 @@ body::before {
   z-index: 1000;
   pointer-events: none;
   opacity: 0.3;
+  animation: scanlines 10s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
 }
 
 /* === CRT SCREEN EFFECT === */
@@ -58,21 +76,33 @@ body::after {
   );
   z-index: 999;
   pointer-events: none;
+  animation: crt-flicker 5s infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  98% { opacity: 0.98; }
+  99% { opacity: 0.99; }
 }
 
 /* === PDA CONTAINER === */
 #pda {
   display: flex;
+  width: 100%;
   height: 100vh;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   border: 3px solid var(--stalker-border);
   box-shadow: var(--stalker-glow);
   overflow: hidden;
+  background: var(--stalker-dark);
 }
 
 /* === SIDE MENU === */
 #menu {
   width: 250px;
+  min-width: 250px;
   background: linear-gradient(
     135deg,
     var(--stalker-dark) 0%,
@@ -83,6 +113,7 @@ body::after {
   flex-direction: column;
   padding: 20px 0;
   position: relative;
+  z-index: 100;
 }
 
 .menu-header {
@@ -94,6 +125,7 @@ body::after {
   text-shadow: var(--stalker-text-glow);
   font-size: 18px;
   background: rgba(0, 255, 0, 0.05);
+  white-space: nowrap;
 }
 
 .menu-item {
@@ -110,6 +142,7 @@ body::after {
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .menu-item::before {
@@ -158,12 +191,15 @@ body::after {
   flex-direction: column;
   position: relative;
   background: rgba(10, 10, 10, 0.95);
+  overflow: hidden;
 }
 
 .section {
   flex: 1;
   position: relative;
   display: none;
+  width: 100%;
+  height: 100%;
 }
 
 .section.active {
@@ -174,6 +210,10 @@ body::after {
 #map {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 /* === CUSTOM LEAFLET CONTROLS STYLING === */
@@ -189,14 +229,15 @@ body::after {
 /* Кастомные кнопки зума */
 .leaflet-control-zoom {
   border: 2px solid var(--stalker-border) !important;
-  background: rgba(0, 0, 0, 0.8) !important;
+  background: rgba(0, 0, 0, 0.9) !important;
   border-radius: 0 !important;
   overflow: hidden;
   margin: 20px !important;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3) !important;
 }
 
 .leaflet-control-zoom a {
-  background: rgba(0, 0, 0, 0.7) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
   border-bottom: 1px solid var(--stalker-border) !important;
   color: var(--stalker-green) !important;
   font-family: 'Courier New', monospace !important;
@@ -204,10 +245,14 @@ body::after {
   font-weight: bold !important;
   text-decoration: none !important;
   transition: all 0.3s ease !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  text-align: center !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background: rgba(0, 255, 0, 0.1) !important;
+  background: rgba(0, 255, 0, 0.2) !important;
   color: #0f0 !important;
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.5) !important;
 }
@@ -226,15 +271,16 @@ body::after {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.9);
   border: 1px solid var(--stalker-border);
-  padding: 3px 8px;
+  padding: 5px 10px;
   font-size: 11px;
   color: var(--stalker-green);
   font-family: 'Courier New', monospace;
   z-index: 1000;
   text-shadow: 0 0 3px #0f0;
   letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 }
 
 /* Map filters for stalker style */
@@ -245,7 +291,6 @@ body::after {
     contrast(110%) 
     brightness(0.8)
     saturate(90%) !important;
-  mix-blend-mode: lighten;
 }
 
 /* === MAP CONTROLS === */
@@ -257,13 +302,14 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  pointer-events: auto;
 }
 
 .map-control-btn {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   border: 2px solid var(--stalker-border);
   color: var(--stalker-green);
-  padding: 10px 15px;
+  padding: 12px 15px;
   cursor: pointer;
   font-family: 'Courier New', monospace;
   font-weight: bold;
@@ -271,109 +317,133 @@ body::after {
   font-size: 12px;
   letter-spacing: 1px;
   transition: all 0.3s ease;
-  min-width: 120px;
+  min-width: 140px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .map-control-btn:hover {
-  background: rgba(0, 255, 0, 0.1);
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  background: rgba(0, 255, 0, 0.15);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+  transform: translateY(-2px);
 }
 
-/* === CUSTOM CSS MARKERS === */
+.map-control-btn:active {
+  transform: translateY(0);
+}
+
+/* === CUSTOM CSS MARKERS (Leaflet DivIcon) === */
 .stalker-marker {
-  width: 40px;
-  height: 40px;
-  position: relative;
-  transform: translate(-50%, -100%);
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  width: 40px !important;
+  height: 40px !important;
+  position: absolute !important;
+  cursor: pointer !important;
   z-index: 1000 !important;
+  pointer-events: auto !important;
 }
 
-.stalker-marker:hover {
-  transform: translate(-50%, -100%) scale(1.2);
-  z-index: 1001 !important;
+/* Стили для маркеров */
+.marker-container {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
 }
 
-.marker-stash {
-  background: radial-gradient(circle at 30% 30%, #0f0 5%, transparent 30%),
-              radial-gradient(circle at 70% 70%, #0f0 5%, transparent 30%);
-  border: 3px solid #0f0;
-  border-radius: 50%;
-  box-shadow: 0 0 20px #0f0;
+.marker-glow {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  border: 2px solid currentColor !important;
+  box-shadow: 0 0 15px currentColor !important;
+  z-index: 1 !important;
 }
 
-.marker-stash::before {
-  content: "▩";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  color: #0f0;
-  text-shadow: 0 0 10px #0f0;
+.marker-icon {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  color: #000 !important;
+  text-shadow: 0 0 3px white !important;
+  z-index: 2 !important;
 }
 
-.marker-quest {
-  background: radial-gradient(circle, #ff0 0%, transparent 70%);
-  border: 3px solid #ff0;
-  border-radius: 50%;
-  box-shadow: 0 0 25px #ff0;
-  animation: pulse-quest 2s infinite;
+/* Цвета маркеров */
+.marker-stash .marker-glow {
+  background: radial-gradient(circle, rgba(0, 255, 0, 0.6) 0%, transparent 70%) !important;
+  color: var(--stalker-green) !important;
+  animation: marker-pulse 2s infinite !important;
 }
 
-.marker-quest::before {
-  content: "!";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
+.marker-quest .marker-glow {
+  background: radial-gradient(circle, rgba(255, 255, 0, 0.6) 0%, transparent 70%) !important;
+  color: var(--stalker-yellow) !important;
+  animation: marker-pulse 1.5s infinite !important;
 }
 
-.marker-danger {
-  background: radial-gradient(circle, #f00 0%, transparent 70%);
-  border: 3px solid #f00;
-  border-radius: 50%;
-  box-shadow: 0 0 25px #f00;
-  animation: pulse-danger 1.5s infinite;
+.marker-danger .marker-glow {
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.6) 0%, transparent 70%) !important;
+  color: var(--stalker-red) !important;
+  animation: marker-pulse 1s infinite !important;
 }
 
-.marker-danger::before {
-  content: "☠";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  color: #000;
+.marker-anomaly .marker-glow {
+  background: radial-gradient(circle, rgba(255, 128, 0, 0.6) 0%, transparent 70%) !important;
+  color: var(--stalker-orange) !important;
+  animation: marker-rotate 4s linear infinite !important;
 }
 
-.marker-anomaly {
-  background: conic-gradient(from 0deg, #0f0, #ff0, #f00, #0f0);
-  border: 3px solid #0f0;
-  border-radius: 50%;
-  box-shadow: 0 0 30px #0f0;
-  animation: rotate-anomaly 4s linear infinite;
+/* Маркер моей позиции */
+.my-position-marker .marker-glow {
+  background: radial-gradient(circle, 
+    rgba(0, 255, 0, 0.9) 0%, 
+    rgba(0, 255, 0, 0.4) 50%, 
+    rgba(0, 255, 0, 0.1) 80%) !important;
+  border: 3px solid var(--stalker-green) !important;
+  box-shadow: 
+    0 0 20px var(--stalker-green),
+    0 0 40px rgba(0, 255, 0, 0.5),
+    inset 0 0 15px rgba(0, 255, 0, 0.3) !important;
+  animation: position-pulse 1.5s infinite !important;
 }
 
-.marker-anomaly::before {
-  content: "⚠";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 22px;
-  color: #000;
-  text-shadow: 0 0 5px #fff;
+.my-position-marker .marker-icon {
+  content: "▼" !important;
+  font-size: 16px !important;
+}
+
+/* Маркер назначения */
+.destination-marker .marker-glow {
+  background: radial-gradient(circle, 
+    rgba(255, 255, 0, 0.9) 0%, 
+    rgba(255, 255, 0, 0.4) 50%, 
+    rgba(255, 255, 0, 0.1) 80%) !important;
+  border: 3px solid var(--stalker-yellow) !important;
+  box-shadow: 
+    0 0 20px var(--stalker-yellow),
+    0 0 40px rgba(255, 255, 0, 0.5),
+    inset 0 0 15px rgba(255, 255, 0, 0.3) !important;
+  animation: destination-pulse 1.2s infinite !important;
+}
+
+.destination-marker .marker-icon {
+  content: "✖" !important;
+  font-size: 16px !important;
 }
 
 /* === STASH LIST SECTION === */
 #stashesSection {
   padding: 20px;
   overflow-y: auto;
+  height: 100%;
 }
 
 .stash-list-header {
@@ -383,6 +453,8 @@ body::after {
   padding: 15px;
   border-bottom: 2px solid var(--stalker-border);
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .stash-list-title {
@@ -390,6 +462,7 @@ body::after {
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: var(--stalker-text-glow);
+  white-space: nowrap;
 }
 
 .stash-grid {
@@ -402,8 +475,8 @@ body::after {
 .stash-card {
   background: linear-gradient(
     145deg,
-    rgba(26, 26, 26, 0.9) 0%,
-    rgba(10, 10, 10, 0.9) 100%
+    rgba(26, 26, 26, 0.95) 0%,
+    rgba(10, 10, 10, 0.95) 100%
   );
   border: 2px solid var(--stalker-border);
   border-radius: 5px;
@@ -412,6 +485,9 @@ body::after {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
 }
 
 .stash-card::before {
@@ -448,12 +524,25 @@ body::after {
   font-weight: bold;
   margin-bottom: 10px;
   text-transform: uppercase;
+  align-self: flex-start;
 }
 
-.type-stash { background: rgba(0, 255, 0, 0.2); }
-.type-quest { background: rgba(255, 255, 0, 0.2); }
-.type-danger { background: rgba(255, 0, 0, 0.2); }
-.type-anomaly { background: rgba(255, 165, 0, 0.2); }
+.type-stash { 
+  background: rgba(0, 255, 0, 0.2); 
+  color: var(--stalker-green);
+}
+.type-quest { 
+  background: rgba(255, 255, 0, 0.2); 
+  color: var(--stalker-yellow);
+}
+.type-danger { 
+  background: rgba(255, 0, 0, 0.2); 
+  color: var(--stalker-red);
+}
+.type-anomaly { 
+  background: rgba(255, 165, 0, 0.2); 
+  color: var(--stalker-orange);
+}
 
 .stash-name {
   font-size: 18px;
@@ -461,6 +550,7 @@ body::after {
   margin-bottom: 10px;
   color: #0f0;
   text-shadow: var(--stalker-text-glow);
+  flex: 0 0 auto;
 }
 
 .stash-desc {
@@ -468,17 +558,47 @@ body::after {
   color: #8f8;
   line-height: 1.4;
   margin-bottom: 10px;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .stash-coords {
   font-size: 12px;
   color: #5f5;
+  opacity: 0.8;
+  flex: 0 0 auto;
+}
+
+.stash-date {
+  font-size: 11px;
+  color: #4a4;
+  margin-top: 5px;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #5f5;
+  font-size: 16px;
+}
+
+.empty-hint {
+  font-size: 14px;
+  color: #4a4;
+  margin-top: 10px;
   opacity: 0.7;
 }
 
 /* === JOURNAL SECTION === */
 #journalSection {
   padding: 20px;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .journal-entry {
@@ -487,12 +607,19 @@ body::after {
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.journal-entry:hover {
+  background: rgba(0, 255, 0, 0.08);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
 }
 
 .journal-date {
   color: #5f5;
   font-size: 12px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 /* === FORM STYLES === */
@@ -511,8 +638,10 @@ body::after {
   padding: 30px;
   z-index: 2000;
   width: 400px;
-  max-width: 90%;
+  max-width: 90vw;
+  max-height: 90vh;
   box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+  overflow-y: auto;
 }
 
 .form-header {
@@ -542,8 +671,8 @@ body::after {
 
 .form-input {
   width: 100%;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.7);
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
   border: 2px solid var(--stalker-border);
   color: #0f0;
   font-family: 'Courier New', monospace;
@@ -555,22 +684,32 @@ body::after {
   outline: none;
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
   border-color: #0f0;
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .form-select {
   width: 100%;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.7);
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
   border: 2px solid var(--stalker-border);
   color: #0f0;
   font-family: 'Courier New', monospace;
   font-size: 14px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  border-color: #0f0;
+  background: rgba(0, 0, 0, 0.9);
 }
 
 textarea.form-input {
   min-height: 100px;
   resize: vertical;
+  font-family: 'Courier New', monospace;
 }
 
 /* === BUTTONS === */
@@ -578,10 +717,12 @@ textarea.form-input {
   display: flex;
   gap: 10px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .btn {
   flex: 1;
+  min-width: 120px;
   padding: 12px;
   border: 2px solid var(--stalker-border);
   background: transparent;
@@ -594,6 +735,8 @@ textarea.form-input {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
 }
 
 .btn::before {
@@ -620,35 +763,110 @@ textarea.form-input {
   transform: translateY(-2px);
 }
 
+.btn:active {
+  transform: translateY(0);
+}
+
 .btn-primary {
+  background: rgba(0, 255, 0, 0.15);
+}
+
+.btn-small {
+  background: transparent;
+  border: 2px solid var(--stalker-border);
+  color: var(--stalker-green);
+  padding: 5px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+}
+
+.btn-small:hover {
   background: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  transform: scale(1.1);
+}
+
+.btn-small:active {
+  transform: scale(1);
 }
 
 /* === POPUP === */
 #stashPopup {
   position: absolute;
-  background: linear-gradient(
-    135deg,
-    var(--stalker-gray) 0%,
-    var(--stalker-dark) 100%
-  );
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%) !important;
   border: 3px solid var(--stalker-border);
   padding: 20px;
   display: none;
   z-index: 1500;
-  width: 300px;
-  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
   border-radius: 5px;
+  pointer-events: auto;
 }
 
 .popup-header {
   font-size: 18px;
+  font-weight: bold;
   margin-bottom: 10px;
   color: #0f0;
   text-shadow: var(--stalker-text-glow);
   border-bottom: 1px solid var(--stalker-border);
-  padding-bottom: 5px;
+  padding-bottom: 8px;
+  word-break: break-word;
 }
+.popup-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.popup-type-stash {
+  background: rgba(0, 255, 0, 0.2);
+  color: var(--stalker-green);
+}
+
+.popup-type-quest {
+  background: rgba(255, 255, 0, 0.2);
+  color: var(--stalker-yellow);
+}
+popup-type-danger {
+  background: rgba(255, 0, 0, 0.2);
+  color: var(--stalker-red);
+}
+
+.popup-type-anomaly {
+  background: rgba(255, 165, 0, 0.2);
+  color: var(--stalker-orange);
+}
+
+.popup-description {
+  font-size: 14px;
+  color: #8f8;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+.popup-coordinates {
+  font-size: 12px;
+  color: #5f5;
+  opacity: 0.8;
+  margin-bottom: 15px;
+  font-family: 'Courier New', monospace;
+}
+
 
 .popup-content {
   margin-bottom: 15px;
@@ -664,42 +882,403 @@ textarea.form-input {
   font-weight: bold;
 }
 
+/* === GPS И НАВИГАЦИЯ === */
+#myPositionBtn {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  background: linear-gradient(145deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+  border: 3px solid var(--stalker-border);
+  border-radius: 5px;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  z-index: 1000;
+  color: var(--stalker-green);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+#myPositionBtn:hover {
+  background: linear-gradient(145deg, rgba(36, 36, 36, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.gps-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 0 5px #0f0);
+  animation: gps-pulse 2s infinite;
+}
+
+#navigationPanel {
+  position: fixed;
+  bottom: 200px;
+  right: 20px;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
+  border: 3px solid var(--stalker-border);
+  border-radius: 5px;
+  padding: 20px;
+  width: 280px;
+  z-index: 1001;
+  box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
+  display: none;
+  animation: panel-appear 0.3s ease;
+}
+
+.navigation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--stalker-border);
+  padding-bottom: 10px;
+}
+
+#navTitle {
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: var(--stalker-text-glow);
+  color: #0f0;
+}
+
+.nav-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.nav-info {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--stalker-border);
+  padding: 12px;
+  border-radius: 3px;
+}
+
+.nav-info div {
+  font-size: 14px;
+  color: #8f8;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-info div:last-child {
+  margin-bottom: 0;
+}
+
+.nav-info span {
+  color: #0f0;
+  font-weight: bold;
+  text-shadow: 0 0 5px #0f0;
+  font-size: 16px;
+}
+
+.nav-btn {
+  background: linear-gradient(145deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 200, 0, 0.1) 100%);
+  border: 2px solid var(--stalker-border);
+  color: var(--stalker-green);
+  padding: 10px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 0 3px #0f0;
+}
+
+.nav-btn:hover {
+  background: linear-gradient(145deg, rgba(0, 255, 0, 0.3) 0%, rgba(0, 200, 0, 0.2) 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+#stopNavigation {
+  background: linear-gradient(145deg, rgba(255, 0, 0, 0.2) 0%, rgba(200, 0, 0, 0.1) 100%);
+  border-color: #f00;
+  display: none;
+}
+
+#stopNavigation:hover {
+  background: linear-gradient(145deg, rgba(255, 0, 0, 0.3) 0%, rgba(200, 0, 0, 0.2) 100%);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+/* Линия маршрута */
+.route-line {
+  stroke: #0f0 !important;
+  stroke-width: 4 !important;
+  stroke-dasharray: 10, 10 !important;
+  fill: none !important;
+  animation: dash 1s linear infinite !important;
+  filter: drop-shadow(0 0 5px #0f0) !important;
+  pointer-events: none !important;
+}
+
 /* === ANIMATIONS === */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
 
-@keyframes pulse-quest {
-  0%, 100% { transform: translate(-50%, -100%) scale(1); }
-  50% { transform: translate(-50%, -100%) scale(1.1); }
+@keyframes marker-pulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1); 
+    opacity: 0.8; 
+  }
 }
 
-@keyframes pulse-danger {
-  0%, 100% { transform: translate(-50%, -100%) scale(1); }
-  50% { transform: translate(-50%, -100%) scale(1.15); }
+@keyframes marker-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-@keyframes rotate-anomaly {
-  from { transform: translate(-50%, -100%) rotate(0deg); }
-  to { transform: translate(-50%, -100%) rotate(360deg); }
+@keyframes position-pulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.25); 
+    opacity: 0.8; 
+  }
+}
+
+@keyframes destination-pulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.2); 
+  }
+}
+
+@keyframes gps-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes panel-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -20;
+  }
 }
 
 /* === SCROLLBAR === */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: rgba(0, 255, 0, 0.05);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--stalker-green);
   border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #0f0;
   box-shadow: 0 0 10px #0f0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  #menu {
+    width: 200px;
+    min-width: 200px;
+  }
+  
+  .menu-item {
+    padding: 15px 20px;
+    font-size: 14px;
+  }
+  
+  .stash-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-controls {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .map-control-btn {
+    min-width: 120px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+  
+  #myPositionBtn {
+    bottom: 80px;
+    right: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  
+  #navigationPanel {
+    bottom: 150px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: 300px;
+  }
+  
+  .gps-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  #menu {
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  .menu-header {
+    font-size: 16px;
+    padding: 12px 15px;
+  }
+  
+  .menu-item {
+    padding: 12px 15px;
+    font-size: 13px;
+    margin: 3px 10px;
+  }
+  
+  .stash-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  #stashFormContainer {
+    padding: 20px;
+    width: 95vw;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn {
+    min-width: 100%;
+  }
+}
+
+/* === LEAFLET POPUP STYLES === */
+.leaflet-popup-content-wrapper, .stashPopup {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%) !important;
+  border: 3px solid var(--stalker-border) !important;
+  border-radius: 5px !important;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.4) !important;
+  color: var(--stalker-green) !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+.leaflet-popup-content {
+  margin: 15px !important;
+  line-height: 1.4 !important;
+  font-size: 14px !important;
+  min-width: 200px !important;
+  color: var(--stalker-green) !important;
+}
+
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--stalker-green) !important;
+  font-size: 20px !important;
+  padding: 5px !important;
+}
+
+/* === UTILITY CLASSES === */
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block !important;
+}
+
+/* === Z-INDEX LAYERS === */
+#map {
+  z-index: 1;
+}
+
+.leaflet-control-container {
+  z-index: 10;
+}
+
+.map-controls {
+  z-index: 1000;
+}
+
+.stalker-marker {
+  z-index: 500;
+}
+
+.my-position-marker {
+  z-index: 501;
+}
+
+.destination-marker {
+  z-index: 502;
+}
+
+#myPositionBtn {
+  z-index: 1000;
+}
+
+#navigationPanel {
+  z-index: 1001;
+}
+
+#stashPopup {
+  z-index: 1500;
+}
+
+#stashFormContainer {
+  z-index: 2000;
+}
+
+body::before, body::after {
+  z-index: 9999;
 }

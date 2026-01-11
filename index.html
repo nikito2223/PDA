@@ -3,22 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>S.T.A.L.K.E.R. PDA v2.0</title>
+<title>PDA</title>
 <link rel="stylesheet" href="style.css">
 <!-- Leaflet.js for map rendering -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-
 </head>
 <body>
     <div id="pda">
         <!-- SIDE MENU -->
         <div id="menu">
-          <div class="menu-header">PDA v2.0</div>
-          <button class="menu-item active" data-section="mapSection">Карта</button>
-          <button class="menu-item" data-section="stashesSection">Тайники</button>
-          <button class="menu-item" data-section="journalSection">Дневник</button>
-
+          <div class="menu-header">ПДА V1.3</div>
+          <button class="menu-item active" data-section="mapSection">
+            <span class="menu-icon">🗺️</span>
+            <span class="menu-text">Карта</span>
+          </button>
+          <button class="menu-item" data-section="stashesSection">
+            <span class="menu-icon">📦</span>
+            <span class="menu-text">Тайники</span>
+            <span class="menu-badge" id="stashCount">0</span>
+          </button>
+          <button class="menu-item" data-section="journalSection">
+            <span class="menu-icon">📔</span>
+            <span class="menu-text">Дневник</span>
+          </button>
+          <button class="menu-item" data-section="journalSection">
+            <span class="menu-icon">📔</span>
+            <span class="menu-text">Чат</span>
+          </button>
+          <!-- Добавляем кнопки фильтрации в меню -->
+          <div class="filter-controls">
+            <div class="filter-title">Фильтры меток:</div>
+            <label class="filter-checkbox">
+              <input type="checkbox" id="filterStash" checked> Тайники
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" id="filterQuest" checked> Задания
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" id="filterDanger" checked> Опасности
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" id="filterAnomaly" checked> Аномалии
+            </label>
+          </div>
+          <!-- Статусная информация -->
+          <div class="menu-footer">
+            <div class="status-item">
+              <span class="status-label">GPS:</span>
+              <span class="status-value" id="gpsStatus">⏳</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">Меток:</span>
+              <span class="status-value" id="markerCount">0</span>
+            </div>
+          </div>
         </div>
         
         <!-- MAIN CONTENT -->
@@ -28,21 +66,36 @@
             <div id="map"></div>
             <!-- MAP CONTROLS -->
             <div class="map-controls">
-              <button class="map-control-btn" id="toggleMapStyle">Стиль: Здания</button>
-              <button class="map-control-btn" id="toggleMarkers">Показать метки</button>
-              <button class="map-control-btn" id="centerMap">Центрировать</button>
-              <button class="map-control-btn" id="toggleNavMode">
-                Режим: СОЗДАНИЕ
-              </button>
-
+              <div class="control-group">
+                <button class="map-control-btn" id="toggleMapStyle">Стиль: Здания</button>
+                <button class="map-control-btn" id="toggleMarkers">Скрыть метки</button>
+                <button class="map-control-btn" id="centerMap">Центрировать</button>
+              </div>
+              <div class="control-group">
+                <button class="map-control-btn" id="toggleNavMode">
+                  Режим: СОЗДАНИЕ
+                </button>
+                <button class="map-control-btn" id="clearTempMarkers">
+                  Очистить выбор
+                </button>
+              </div>
             </div>
           </div>
         
           <!-- STASHES SECTION -->
           <div id="stashesSection" class="section">
             <div class="stash-list-header">
-              <div class="stash-list-title">ТАЙНИКИ ЗОНЫ</div>
-              <button class="btn" id="addStashBtn">+ Добавить тайник</button>
+              <div class="stash-list-title">
+                <span class="list-icon">📦</span>
+                ТАЙНИКИ ЗОНЫ
+                <span class="list-count" id="stashListCount">(0)</span>
+              </div>
+              <div class="list-actions">
+                <button class="btn btn-small" id="filterAll">Все</button>
+                <button class="btn btn-small" id="filterStashes">Тайники</button>
+                <button class="btn btn-small" id="filterQuests">Задания</button>
+                <button class="btn" id="addStashBtn">+ Добавить</button>
+              </div>
             </div>
             <div class="stash-grid" id="stashList">
               <!-- Stash cards will be added here -->
@@ -52,20 +105,24 @@
           <!-- JOURNAL SECTION -->
           <div id="journalSection" class="section">
             <div class="stash-list-header">
-              <div class="stash-list-title">ДНЕВНИК СТАЛКЕРА</div>
+              <div class="stash-list-title">
+                <span class="list-icon">📔</span>
+                ДНЕВНИК СТАЛКЕРА
+              </div>
+              <button class="btn" id="addJournalBtn">+ Запись</button>
             </div>
             <div id="journalContent">
               <div class="journal-entry">
                 <div class="journal-date">12.08.2023 - 14:30</div>
-                <div>Обнаружил аномалию "Жарка" у заброшенной фермы. Будьте осторожны, братья.</div>
+                <div class="journal-text">Обнаружил аномалию "Жарка" у заброшенной фермы. Будьте осторожны, братья.</div>
               </div>
               <div class="journal-entry">
                 <div class="journal-date">11.08.2023 - 09:15</div>
-                <div>Схрон с припасами в подвале разрушенного сарая в Кордоне пополнен.</div>
+                <div class="journal-text">Схрон с припасами в подвале разрушенного сарая в Кордоне пополнен.</div>
               </div>
               <div class="journal-entry">
                 <div class="journal-date">10.08.2023 - 16:45</div>
-                <div>Мутанты активизировались около свалки. Нужно проверить старые тайники.</div>
+                <div class="journal-text">Мутанты активизировались около свалки. Нужно проверить старые тайники.</div>
               </div>
             </div>
           </div>
@@ -86,6 +143,7 @@
       </div>
       <div class="nav-content">
         <div class="nav-info">
+          <div>Цель: <span id="navTarget">-</span></div>
           <div>Дистанция: <span id="navDistance">-</span></div>
           <div>Время: <span id="navTime">-</span></div>
           <div>Статус: <span id="navStatus">Ожидание</span></div>
@@ -95,11 +153,19 @@
       </div>
     </div>
 
-    
-    <!-- Статус навигации -->
-    <div id="navStatusBar" class="nav-status">
-      <span id="statusText">Навигация активна</span>
-      <span id="statusDistance"> - 0.0 км</span>
+    <div class="pda-status-bar">
+      <div class="status-item coordinates-item">
+        <span class="status-icon">📍</span>
+        <a href="#" class="coordinates-link" id="currentPosition">Координаты: 54,9220, 33,3091</a>
+      </div>
+      <div class="status-item">
+        <span class="status-icon">🗺️</span>
+        <span class="scale-info" id="currentZoom">Масштаб: 15х</span>
+      </div>
+      <div class="status-item">
+        <span class="status-icon">🕒</span>
+        <span class="position-info" id="currentTime">Позиция</span>
+      </div>
     </div>
 
     <!-- STASH FORM POPUP -->
@@ -108,20 +174,26 @@
       <form id="stashForm">
         <div class="form-group">
           <label for="stashName">Название</label>
-          <input type="text" id="stashName" class="form-input" required>
+          <input type="text" id="stashName" class="form-input" placeholder="Введите название" required>
         </div>
         <div class="form-group">
           <label for="stashDesc">Описание</label>
-          <textarea id="stashDesc" class="form-input"></textarea>
+          <textarea id="stashDesc" class="form-input" placeholder="Опишите тайник или точку"></textarea>
         </div>
         <div class="form-group">
           <label for="stashType">Тип</label>
           <select id="stashType" class="form-select">
-            <option value="stash">Тайник</option>
-            <option value="quest">Задание</option>
-            <option value="danger">Опасная зона</option>
-            <option value="anomaly">Аномалия</option>
+            <option value="stash">📦 Тайник</option>
+            <option value="quest">❓ Задание</option>
+            <option value="danger">⚠️ Опасная зона</option>
+            <option value="anomaly">🌀 Аномалия</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label>Координаты</label>
+          <div class="coord-display">
+            <span id="coordLat">-</span>, <span id="coordLng">-</span>
+          </div>
         </div>
         <input type="hidden" id="stashLat">
         <input type="hidden" id="stashLng">
@@ -136,42 +208,23 @@
     <!-- STASH INFO POPUP -->
     <div id="stashPopup">
       <div class="popup-header" id="popupName"></div>
+      <div class="popup-type-badge" id="popupTypeBadge"></div>
       <div class="popup-content">
-        <div id="popupDesc"></div>
-        <div class="popup-type" id="popupType"></div>
-        <div id="popupCoords"></div>
+        <div class="popup-description" id="popupDesc"></div>
+        <div class="popup-coordinates" id="popupCoords"></div>
+        <div class="popup-date" id="popupDate"></div>
       </div>
       <div class="btn-group">
+        <button class="btn btn-primary" id="popupNavigate">Маршрут</button>
         <button class="btn" id="popupEdit">Изменить</button>
-        <button class="btn" id="popupDelete">Удалить</button>
+        <button class="btn btn-danger" id="popupDelete">Удалить</button>
       </div>
     </div>
-    
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
-    <!-- Добавьте Supabase клиент -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Также убедитесь что у вас есть div для аутентификации (опционально) -->
-    <div id="auth-container" style="display: none;">
-      <button id="signInButton">Войти</button>
-      <button id="signOutButton" style="display: none;">Выйти</button>
-    </div>
-
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
-    />
-    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-    <!-- ORS plugin -->
-    <script src="https://unpkg.com/leaflet-routing-openrouteservice/leaflet-routing-openrouteservice.js"></script>
-
-
-
-    
     <script src="main.js"></script>
-
 </body>
 </html>

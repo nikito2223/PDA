@@ -1,0 +1,23 @@
+{
+  "name": "tcp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "global.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikito2223/PDA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nikito2223/PDA/issues"
+  },
+  "homepage": "https://github.com/nikito2223/PDA#readme",
+  "dependencies": {
+    "electron": "^39.2.7"
+  }
+}

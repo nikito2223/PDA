@@ -1877,3 +1877,154 @@ textarea.form-input {
     display: none !important;
   }
 }
+
+.satellite-mode .stalker-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.satellite-mode .my-position-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 15px rgba(199, 254, 199, 0.8);
+}
+
+.satellite-mode .destination-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 15px rgba(255, 100, 100, 0.8);
+}
+
+.satellite-mode .leaflet-routing-container {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  border: 2px solid #8b9d6b !important;
+}
+
+.location-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #8b9d6b;
+  border-radius: 8px;
+  padding: 15px;
+  max-width: 300px;
+  z-index: 10000;
+  transform: translateX(150%);
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.location-notification.show {
+  transform: translateX(0);
+}
+
+.notification-content h3 {
+  margin: 0 0 8px 0;
+  color: #8b9d6b;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.notification-content p {
+  margin: 0 0 10px 0;
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notification-coords {
+  font-size: 12px;
+  color: #999;
+  font-family: monospace;
+}
+
+.satellite-mode .stalker-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.satellite-mode .my-position-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 15px rgba(199, 254, 199, 0.8);
+}
+
+.satellite-mode .destination-marker .marker-glow {
+  border-width: 3px !important;
+  box-shadow: 0 0 15px rgba(255, 100, 100, 0.8);
+}
+
+.satellite-mode .leaflet-routing-container {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  border: 2px solid #8b9d6b !important;
+}
+
+/* Красивые маркеры */
+.beautiful-marker {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.marker-pulse {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: pulse 2s infinite;
+  top: 0;
+  left: 0;
+}
+
+.marker-circle {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.marker-symbol {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.marker-shadow {
+  position: absolute;
+  width: 10px;
+  height: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  bottom: -4px;
+  left: 16px;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.2; }
+  100% { transform: scale(0.8); opacity: 0.4; }
+}
+
+/* Маркеры для разных типов */
+.beautiful-marker-stash .marker-circle { background-color: #8b9d6b; }
+.beautiful-marker-quest .marker-circle { background-color: #d9b443; }
+.beautiful-marker-danger .marker-circle { background-color: #d94343; }
+.beautiful-marker-anomaly .marker-circle { background-color: #6b9d8b; }
+
+/* Адаптация для темного режима */
+.satellite-mode .beautiful-marker {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.satellite-mode .marker-circle {
+  border: 3px solid white;
+}

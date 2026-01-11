@@ -12,7 +12,7 @@
     <div id="pda">
         <!-- SIDE MENU -->
         <div id="menu">
-          <div class="menu-header">ПДА V1.3</div>
+          <div class="menu-header">ПДА V1.4</div>
           <button class="menu-item active" data-section="mapSection">
             <span class="menu-icon">🗺️</span>
             <span class="menu-text">Карта</span>
@@ -77,6 +77,11 @@
                 </button>
                 <button class="map-control-btn" id="clearTempMarkers">
                   Очистить выбор
+                </button>
+              </div>
+              <div class="control-group">
+                <button class="map-control-btn" id="toggleLocation">
+                  Тематика: Дорогобуж
                 </button>
               </div>
             </div>
@@ -220,11 +225,26 @@
         <button class="btn btn-danger" id="popupDelete">Удалить</button>
       </div>
     </div>
+    <div id="customCursor"></div>
+    <!-- В head после leaflet.css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.0.0/Control.FullScreen.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.78.0/dist/L.Control.Locate.min.css" />
+    
+    <!-- В body после leaflet.js -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.0.0/Control.FullScreen.min.js"></script>
+    <script src="https://unpkg.com/leaflet.locatecontrol@0.78.0/dist/L.Control.Locate.min.js"></script>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script src="scripts/map.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/database.js"></script>
+
     <script src="main.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </body>
 </html>

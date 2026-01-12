@@ -2028,3 +2028,7 @@ textarea.form-input {
 .satellite-mode .marker-circle {
   border: 3px solid white;
 }
+
+.login-form-container {
+  bottom: 10%;
+}

@@ -1,0 +1,1003 @@
+/* === ROOT VARIABLES === */
+:root {
+  --stalker-green: #c7fec7;
+  --stalker-dark: #0a0a08;
+  --stalker-panel: #1a1c18;
+  --stalker-border: #3a4d3a;
+  --stalker-glow: 0 0 10px rgba(199, 254, 199, 0.3);
+  --stalker-text: #e0f0e0;
+  --stalker-accent: #8b9d6b;
+  --stalker-danger: #d94343;
+  --stalker-warning: #d9b443;
+  --stalker-quest: #6b9d8b;
+  --stalker-gray: #b0c0b0;
+  --stalker-bg-dark: #11110e;
+
+    /* Территории */
+  --territory-free: #48bb78;
+  --territory-owned: #4299e1;
+  --territory-war: #f56565;
+  --territory-neutral: #a0aec0;
+}
+
+/* === RESET & BASE === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Arial', 'Courier New', monospace;
+  background: #000;
+  color: var(--stalker-text);
+  touch-action: manipulation;
+}
+
+/* === UTILITY CLASSES === */
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block !important;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(58, 77, 58, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a4d3a;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a5d4a;
+}
+
+/* === ANIMATIONS === */
+@keyframes position-pulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.8; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes marker-pulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1); 
+    opacity: 0.8; 
+  }
+}
+
+@keyframes marker-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.2; }
+  100% { transform: scale(0.8); opacity: 0.4; }
+}
+
+/* === ACCESSIBILITY === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  #content::after {
+    animation: none !important;
+  }
+  
+  .marker-glow,
+  .my-position-marker .marker-glow {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  #pda::before,
+  #content::after {
+    opacity: 0.1;
+  }
+}
+
+/* === PERFORMANCE OPTIMIZATIONS === */
+@media (prefers-contrast: high) {
+  :root {
+    --stalker-green: #ffffff;
+    --stalker-text: #ffffff;
+    --stalker-border: #ffffff;
+  }
+  
+  #pda {
+    border-image: none;
+    border-color: #ffffff;
+  }
+}
+
+/* === DARK MODE SUPPORT === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --stalker-green: #b0f0b0;
+    --stalker-text: #d0e0d0;
+  }
+}
+
+/* === PRINT STYLES === */
+@media print {
+  #menu, .map-controls, #myPositionBtn, #navigationPanel, .pda-status-bar {
+    display: none !important;
+  }
+  
+  #content, #pda, body, html {
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+    overflow: visible !important;
+  }
+  
+  #map {
+    height: 500px !important;
+  }
+  
+  .stash-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* === TERRITORIES STYLES === */
+
+/* === КОНТЕЙНЕР РАЗДЕЛА === */
+#territoriesSection {
+  display: none;
+  padding: 15px;
+  height: 100%;
+  overflow-y: auto;
+  background: linear-gradient(135deg, rgba(26, 28, 24, 0.95) 0%, rgba(10, 10, 8, 0.98) 100%);
+}
+
+#territoriesSection.active {
+  display: block;
+}
+
+/* === ШАПКА РАЗДЕЛА === */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(to right, #2a352a, transparent);
+  border-bottom: 1px solid var(--stalker-border);
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.section-header h2 {
+  color: var(--stalker-green);
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* === ВКЛАДКИ === */
+.tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--stalker-border);
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  background: linear-gradient(to bottom, #232722, #1a1c18);
+  border: 1px solid var(--stalker-border);
+  color: var(--stalker-gray);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Arial', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 1px;
+}
+
+.tab-btn:hover {
+  background: linear-gradient(to bottom, #2a352a, #232722);
+  color: var(--stalker-text);
+  border-color: var(--stalker-accent);
+}
+
+.tab-btn.active {
+  background: linear-gradient(to bottom, #2a352a, #1a1c18);
+  color: var(--stalker-green);
+  border-bottom: 1px solid transparent;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* === СОДЕРЖИМОЕ ВКЛАДОК === */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.section-description {
+  background: rgba(26, 28, 24, 0.5);
+  border: 1px solid var(--stalker-border);
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  color: var(--stalker-gray);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.section-description p {
+  margin: 0;
+}
+
+/* === КОНТЕЙНЕР КАРТОЧЕК === */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 15px;
+  padding: 5px;
+}
+
+/* === КАРТОЧКА ТЕРРИТОРИИ === */
+.territory-card {
+  background: linear-gradient(145deg, #232722, #1a1c18);
+  border: 1px solid var(--stalker-border);
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.territory-card:hover {
+  border-color: var(--stalker-accent);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Шапка карточки */
+.territory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.territory-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--stalker-text);
+  flex: 1;
+  word-break: break-word;
+}
+
+.territory-status {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.status-war {
+  background: rgba(245, 101, 101, 0.3);
+  color: var(--territory-war);
+  border: 1px solid var(--territory-war);
+  animation: pulse-red 2s infinite;
+}
+
+.status-owned {
+  background: rgba(66, 153, 225, 0.2);
+  color: var(--territory-owned);
+  border: 1px solid var(--territory-owned);
+}
+
+.status-free {
+  background: rgba(72, 187, 120, 0.2);
+  color: var(--territory-free);
+  border: 1px solid var(--territory-free);
+}
+
+.status-neutral {
+  background: rgba(160, 174, 192, 0.2);
+  color: var(--territory-neutral);
+  border: 1px solid var(--territory-neutral);
+}
+
+/* Описание территории */
+.territory-description {
+  color: var(--stalker-gray);
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 15px;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Информация о территории */
+.territory-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(58, 77, 58, 0.1);
+  border-radius: 4px;
+}
+
+.territory-owner {
+  font-size: 13px;
+  color: var(--stalker-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.territory-owner::before {
+  content: "👥";
+  font-size: 14px;
+}
+
+.territory-health {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.health-bar {
+  flex-grow: 1;
+  height: 6px;
+  background: rgba(58, 77, 58, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Информация о войне */
+.war-info {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid var(--territory-war);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.war-info div {
+  font-size: 12px;
+  color: var(--territory-war);
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.war-progress {
+  display: flex;
+  height: 16px;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.war-attacker {
+  background: linear-gradient(to right, #f56565, #c53030);
+  text-align: center;
+  font-size: 10px;
+  line-height: 16px;
+  color: white;
+  font-weight: bold;
+  transition: width 0.5s ease;
+}
+
+.war-defender {
+  background: linear-gradient(to right, #4299e1, #2b6cb0);
+  text-align: center;
+  font-size: 10px;
+  line-height: 16px;
+  color: white;
+  font-weight: bold;
+  transition: width 0.5s ease;
+}
+
+/* Действия с территорией */
+.territory-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(58, 77, 58, 0.5);
+}
+
+.territory-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: rgba(58, 77, 58, 0.3);
+  border: 1px solid var(--stalker-border);
+  color: var(--stalker-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.territory-action-btn:hover {
+  background: rgba(139, 157, 107, 0.2);
+  color: var(--stalker-green);
+  border-color: var(--stalker-accent);
+}
+
+/* === КАРТОЧКА ВОЙНЫ === */
+.war-card {
+  background: linear-gradient(145deg, #232722, #1a1c18);
+  border: 1px solid var(--stalker-border);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+}
+
+.war-card:hover {
+  border-color: var(--territory-war);
+  box-shadow: 0 4px 8px rgba(245, 101, 101, 0.2);
+}
+
+/* Шапка войны */
+.war-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(245, 101, 101, 0.3);
+}
+
+.war-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--stalker-text);
+  word-break: break-word;
+}
+
+.war-status {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: rgba(217, 180, 67, 0.2);
+  color: var(--stalker-warning);
+  border: 1px solid var(--stalker-warning);
+}
+
+.status-active {
+  background: rgba(245, 101, 101, 0.3);
+  color: var(--territory-war);
+  border: 1px solid var(--territory-war);
+  animation: pulse-red 2s infinite;
+}
+
+/* Стороны конфликта */
+.war-parties {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 12px;
+  background: rgba(58, 77, 58, 0.1);
+  border-radius: 4px;
+}
+
+.war-party {
+  flex: 1;
+  text-align: center;
+  padding: 5px;
+}
+
+.war-party.my-faction {
+  background: rgba(66, 153, 225, 0.1);
+  border-radius: 4px;
+}
+
+.party-role {
+  font-size: 11px;
+  color: var(--stalker-gray);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.party-name {
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--stalker-text);
+}
+
+.vs {
+  padding: 0 15px;
+  color: var(--territory-war);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Прогресс войны */
+.war-progress {
+  margin-bottom: 15px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: var(--stalker-gray);
+}
+
+.war-progress-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.attacker-progress {
+  background: linear-gradient(to right, #f56565, #c53030);
+  transition: width 0.5s ease;
+}
+
+.defender-progress {
+  background: linear-gradient(to right, #4299e1, #2b6cb0);
+  transition: width 0.5s ease;
+}
+
+/* Действия войны */
+.war-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.war-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: rgba(58, 77, 58, 0.3);
+  border: 1px solid var(--stalker-border);
+  color: var(--stalker-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.war-action-btn:hover {
+  background: rgba(139, 157, 107, 0.2);
+  color: var(--stalker-green);
+  border-color: var(--stalker-accent);
+}
+
+/* Дата войны */
+.war-date {
+  font-size: 11px;
+  color: #6a7a5a;
+  text-align: center;
+  font-style: italic;
+}
+
+/* === ПУСТОЕ СОСТОЯНИЕ === */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #6a7a5a;
+  font-size: 16px;
+}
+
+.empty-hint {
+  font-size: 14px;
+  color: #5a6d4b;
+  margin-top: 10px;
+  opacity: 0.7;
+}
+
+/* === ПОПАПЫ И КОНТЕКСТНЫЕ МЕНЮ === */
+
+/* Контекстное меню территории */
+.territory-context-menu {
+  position: fixed;
+  background: linear-gradient(145deg, #1a1c18, #232722);
+  border: 1px solid var(--stalker-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  min-width: 220px;
+  overflow: hidden;
+}
+
+.context-menu-header {
+  padding: 12px 15px;
+  background: linear-gradient(to right, #2a352a, #1a1c18);
+  color: var(--stalker-green);
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--stalker-border);
+}
+
+.context-menu-item {
+  padding: 12px 15px;
+  color: var(--stalker-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(58, 77, 58, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.context-menu-item:last-child {
+  border-bottom: none;
+}
+
+.context-menu-item:hover {
+  background: rgba(139, 157, 107, 0.1);
+  color: var(--stalker-green);
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--stalker-border);
+  margin: 5px 0;
+}
+
+/* Попап создания территории */
+.territory-creation-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #1a1c18, #232722);
+  border: 2px solid var(--stalker-border);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 2000;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+}
+
+.territory-details-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #1a1c18, #232722);
+  border: 2px solid var(--stalker-border);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 2000;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+}
+
+/* Стили для формы */
+.form-info {
+  background: rgba(66, 153, 225, 0.1);
+  border: 1px solid var(--territory-owned);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 15px 0;
+  font-size: 13px;
+  color: var(--stalker-gray);
+}
+
+.form-info strong {
+  color: var(--stalker-accent);
+}
+
+.form-info small {
+  color: #6a7a5a;
+  font-size: 12px;
+}
+
+.member-select-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(58, 77, 58, 0.1);
+  border: 1px solid var(--stalker-border);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.member-select-item:hover {
+  background: rgba(139, 157, 107, 0.1);
+  border-color: var(--stalker-accent);
+}
+
+/* Анимации */
+@keyframes pulse-red {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(245, 101, 101, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(245, 101, 101, 0.6);
+  }
+}
+
+@keyframes pulse-blue {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(66, 153, 225, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(66, 153, 225, 0.6);
+  }
+}
+
+@keyframes pulse-green {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(72, 187, 120, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(72, 187, 120, 0.6);
+  }
+}
+
+/* === МОБИЛЬНАЯ АДАПТАЦИЯ === */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .section-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab-btn {
+    padding: 8px 15px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  
+  .cards-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .territory-card {
+    min-height: 160px;
+    padding: 12px;
+  }
+  
+  .territory-name {
+    font-size: 15px;
+  }
+  
+  .territory-description {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+  
+  .territory-info {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .territory-health {
+    width: 100%;
+  }
+  
+  .territory-actions {
+    flex-wrap: wrap;
+  }
+  
+  .territory-action-btn {
+    min-width: calc(50% - 4px);
+  }
+  
+  .war-parties {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .vs {
+    padding: 10px 0;
+  }
+  
+  .war-actions {
+    flex-wrap: wrap;
+  }
+  
+  .war-action-btn {
+    min-width: calc(50% - 4px);
+  }
+  
+  /* Попапы на мобильных */
+  .territory-creation-popup,
+  .territory-details-popup {
+    width: 95vw;
+    max-height: 85vh;
+    padding: 15px;
+  }
+  
+  .territory-context-menu {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header h2 {
+    font-size: 16px;
+  }
+  
+  .territory-card {
+    min-height: 150px;
+    padding: 10px;
+  }
+  
+  .territory-name {
+    font-size: 14px;
+  }
+  
+  .territory-status {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+  
+  .territory-action-btn {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  
+  .war-title {
+    font-size: 14px;
+  }
+  
+  .war-status {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+  
+  .territory-context-menu {
+    min-width: 180px;
+  }
+  
+  .context-menu-item {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Ландшафтная ориентация */
+@media (max-height: 500px) and (orientation: landscape) {
+  .territory-card {
+    min-height: 140px;
+  }
+  
+  .territory-description {
+    -webkit-line-clamp: 1;
+  }
+  
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+/* Оптимизация для тач-устройств */
+@media (hover: none) and (pointer: coarse) {
+  .territory-card,
+  .war-card,
+  .territory-action-btn,
+  .war-action-btn,
+  .context-menu-item {
+    min-height: 44px;
+  }
+  
+  .territory-card:active,
+  .war-card:active {
+    transform: scale(0.98);
+    background: linear-gradient(145deg, #2a352a, #1a1c18);
+  }
+  
+  .territory-action-btn:active,
+  .war-action-btn:active {
+    background: rgba(139, 157, 107, 0.3);
+    transform: scale(0.95);
+  }
+}

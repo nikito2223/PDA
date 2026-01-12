@@ -222,7 +222,7 @@ function initNavigation() {
   if (stopNavBtn) stopNavBtn.addEventListener('click', stopNavigation);
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
+    window.electronGeo.getCurrentPosition(
       (position) => {
         userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
         updateUserPositionMarker();

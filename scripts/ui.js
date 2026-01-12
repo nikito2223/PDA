@@ -17,6 +17,247 @@ const stashIdInput = document.getElementById('stashId');
 const coordLat = document.getElementById('coordLat');
 const coordLng = document.getElementById('coordLng');
 
+const loginFormContainer = document.getElementById('loginFormContainer');
+const loginBtn = document.getElementById('showLoginFormBtn');
+const loginCancelBtn = document.getElementById('loginCancelBtn');
+const userContainer = document.getElementById('userContainer');
+const userNicknameSpan = document.getElementById('userNickname');
+const logoutBtn = document.getElementById('logoutBtn');
+
+
+document.getElementById('addGroupBtn')?.addEventListener('click', () => {
+  document.getElementById('groupFormContainer').style.display = 'block';
+});
+
+document.getElementById('groupCancel')?.addEventListener('click', () => {
+  document.getElementById('groupFormContainer').style.display = 'none';
+});
+
+document.getElementById('groupForm')?.addEventListener('submit', e => {
+  e.preventDefault();
+  const groupName = document.getElementById('groupName');
+  const groupDesc = document.getElementById('groupDesc');
+  if (window.groupModule && groupName && groupDesc) {
+    window.groupModule.createGroup(
+      groupName.value,
+      groupDesc.value
+    );
+    document.getElementById('groupFormContainer').style.display = 'none';
+  }
+});
+
+// Показ формы входа
+loginBtn?.addEventListener('click', () => loginFormContainer.style.display = 'block');
+loginCancelBtn?.addEventListener('click', () => loginFormContainer.style.display = 'none');
+
+logoutBtn?.addEventListener('click', async () => {
+  try {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    await updateAuthUI(); // Обновляем UI после выхода
+    console.log('Выход выполнен успешно');
+  } catch (error) {
+    console.error('Ошибка при выходе:', error);
+  }
+});
+
+document.getElementById('loginForm')?.addEventListener('submit', e => {
+  e.preventDefault();
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginNickname = document.getElementById('loginNickname');
+  
+  if (window.groupModule && loginEmail && loginPassword) {
+    window.groupModule.login(
+      loginEmail.value,
+      loginPassword.value,
+      loginNickname?.value || ''
+    );
+  }
+});
+
+document.getElementById('registerSubmitBtn')?.addEventListener('click', () => {
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginNickname = document.getElementById('loginNickname');
+  
+  if (window.groupModule && loginEmail && loginPassword && loginNickname) {
+    window.groupModule.register(
+      loginEmail.value,
+      loginPassword.value,
+      loginNickname.value
+    );
+  }
+});
+
+async function updateAuthUI() {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    if (session?.user) {
+      // Пользователь авторизован
+      currentUser = session.user;
+      const nickname = currentUser.user_metadata?.nickname || currentUser.email || 'Пользователь';
+      
+      if (userNicknameSpan) {
+        userNicknameSpan.textContent = nickname;
+      }
+      
+      if (userContainer) {
+        userContainer.style.display = 'flex';
+      }
+      
+      if (loginBtn) {
+        loginBtn.style.display = 'none';
+      }
+      
+      if (loginFormContainer) {
+        loginFormContainer.style.display = 'none';
+      }
+      
+      console.log('Пользователь авторизован:', nickname);
+    } else {
+      // Пользователь не авторизован
+      currentUser = null;
+      
+      if (userContainer) {
+        userContainer.style.display = 'none';
+      }
+      
+      if (loginBtn) {
+        loginBtn.style.display = 'inline-block';
+      }
+      
+      console.log('Пользователь не авторизован');
+    }
+  } catch (error) {
+    console.error('Ошибка при обновлении UI авторизации:', error);
+  }
+}
+
+
+async function checkAuth() {
+  try {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (error) {
+      console.error('Ошибка проверки сессии:', error.message);
+      return null;
+    }
+    
+    if (session && session.user) {
+      currentUser = session.user;
+      console.log('Авторизован пользователь:', currentUser.email);
+    } else {
+      currentUser = null;
+      console.log('Пользователь не авторизован');
+    }
+    
+    // Обновляем UI
+    await updateAuthUI();
+    
+    return currentUser;
+  } catch (error) {
+    console.error('Ошибка при проверке авторизации:', error);
+    return null;
+  }
+}
+
+function updateUIForLoggedInUser() {
+  const loginContainer = document.getElementById('loginContainer'); // контейнер с кнопками входа/регистрации
+  const userContainer = document.getElementById('userContainer');   // место, где пишем имя пользователя
+
+  if (loginContainer) loginContainer.style.display = 'none';
+  if (userContainer && currentUser) {
+    userContainer.style.display = 'block';
+    userContainer.textContent = `Привет, ${currentUser.user_metadata?.nickname || currentUser.email}!`;
+  }
+}
+
+
+
+
+function renderGroups(groups) {
+  const groupsContainer = document.getElementById('groupsList');
+  if (!groupsContainer) return;
+
+  // Очищаем контейнер
+  groupsContainer.innerHTML = '';
+  
+  // Если нет группировок
+  if (!groups || groups.length === 0) {
+    groupsContainer.innerHTML = `
+      <div class="empty-groups">
+        <div class="empty-groups-icon">👥</div>
+        <h3>Пока нет группировок</h3>
+        <p>Создайте первую группировку или вступите в существующую!</p>
+        <button class="btn btn-primary" id="createFirstGroupBtn">Создать группировку</button>
+      </div>
+    `;
+    
+    // Добавляем обработчик кнопки
+    document.getElementById('createFirstGroupBtn')?.addEventListener('click', () => {
+      document.getElementById('groupFormContainer').style.display = 'block';
+    });
+    
+    return;
+  }
+
+  // Создаем карточки для каждой группировки
+  groups.forEach(group => {
+    const groupCard = document.createElement('div');
+    groupCard.className = 'group-card';
+    groupCard.dataset.id = group.id;
+    
+    groupCard.innerHTML = `
+      <div class="group-title">
+        <span class="group-title-icon">👥</span>
+        ${group.name}
+      </div>
+      <div class="group-desc">${group.description || 'Описание отсутствует'}</div>
+      <div class="group-info">
+        <div class="group-members">
+          👤 <span>${group.member_count || 0}</span>
+        </div>
+        <div class="group-date">
+          ${new Date(group.created_at).toLocaleDateString('ru-RU')}
+        </div>
+      </div>
+      <div class="group-actions">
+        <button class="group-action-btn join" onclick="joinGroup('${group.id}')">
+          Вступить
+        </button>
+        <button class="group-action-btn" onclick="viewGroupDetails('${group.id}')">
+          Подробнее
+        </button>
+      </div>
+    `;
+    
+    groupsContainer.appendChild(groupCard);
+  });
+}
+
+
+
+window.joinGroup = async function(groupId) {
+  if (!currentUser) {
+    alert('Для вступления в группировку необходимо авторизоваться');
+    loginFormContainer.style.display = 'block';
+    return;
+  }
+  
+  if (window.groupModule) {
+    await window.groupModule.joinGroup(groupId);
+  }
+};
+
+window.viewGroupDetails = function(groupId) {
+  // Здесь будет логика просмотра деталей группы
+  alert('Просмотр деталей группы ' + groupId);
+};
+
+
+
 let navigationMode = false;
 let selectedLatLng = null;
 
@@ -61,14 +302,15 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 // === ОСНОВНАЯ ИНИЦИАЛИЗАЦИЯ ===
-function initUI() {
+async function initUI()  {
   console.log('Инициализация интерфейса...');
-  
-  // Оптимизация под мобильные устройства
-  if (isMobile || isTouchDevice) {
-    document.body.classList.add('mobile-device');
-    if (isMobile) document.body.classList.add('is-mobile');
-    if (isTouchDevice) document.body.classList.add('is-touch');
+
+  // Проверяем авторизацию
+  await checkAuth();
+
+  // Загружаем группировки если есть модуль
+  if (window.groupModule) {
+    await window.groupModule.loadGroups();
   }
   
   // Инициализация кнопки смены локации
@@ -115,6 +357,9 @@ function initUI() {
   
   // Оптимизация для мобильных
   optimizeForMobile();
+  
+  // Обновляем статус-бар каждую секунду
+  setInterval(updateStatusBar, 1000);
   
   console.log('Интерфейс инициализирован');
   return true;
@@ -732,8 +977,12 @@ window.uiModule = {
   openEditForm,
   updateStatusBar,
   optimizeForMobile,
+  checkAuth,
+  updateAuthUI,
   getActiveFilters: () => activeFilters,
   getTypeConfig: () => typeConfig,
   isMobile: () => isMobile,
-  isTouchDevice: () => isTouchDevice
+  isTouchDevice: () => isTouchDevice,
+  getCurrentUser: () => currentUser,
+  renderGroups
 };

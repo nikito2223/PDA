@@ -339,6 +339,8 @@ window.startNavigationToPoint = function(lat, lng) {
   }
 };
 
+
+
 // === ЗАПУСК ПРИЛОЖЕНИЯ ПРИ ЗАГРУЗКЕ ===
 document.addEventListener('DOMContentLoaded', function() {
   console.log('📱 DOM загружен, запуск инициализации...');

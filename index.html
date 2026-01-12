@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDA</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/map.css">
+<link rel="stylesheet" href="styles/menu.css">
+<link rel="stylesheet" href="styles/sections.css">
+<link rel="stylesheet" href="styles/variables.css">
 <!-- Leaflet.js for map rendering -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
@@ -12,7 +16,7 @@
     <div id="pda">
         <!-- SIDE MENU -->
         <div id="menu">
-          <div class="menu-header">ПДА V1.4</div>
+          <div class="menu-header">ПДА V1.5</div>
           <button class="menu-item active" data-section="mapSection">
             <span class="menu-icon">🗺️</span>
             <span class="menu-text">Карта</span>
@@ -26,9 +30,9 @@
             <span class="menu-icon">📔</span>
             <span class="menu-text">Дневник</span>
           </button>
-          <button class="menu-item" data-section="journalSection">
-            <span class="menu-icon">📔</span>
-            <span class="menu-text">Чат</span>
+          <button class="menu-item" data-section="groupsSection">
+            <span class="menu-icon">👥</span>
+            <span class="menu-text">Группировки</span>
           </button>
           <!-- Добавляем кнопки фильтрации в меню -->
           <div class="filter-controls">
@@ -131,9 +135,99 @@
               </div>
             </div>
           </div>
+
+          <!-- GROUPS SECTION -->
+          <div id="groupsSection" class="section">
+            <div class="stash-list-header">
+              <div class="stash-list-title">
+                <span class="list-icon">👥</span>
+                ГРУППИРОВКИ
+                <span class="list-count" id="groupsListCount">(0)</span>
+              </div>
+              <div class="list-actions">
+                <button class="btn" id="addGroupBtn">+ Создать</button>
+                  <div id="loginBtnContainer">
+                      <button class="btn" id="showLoginFormBtn">Войти / Регистрация</button>
+                  </div>
+                  <div id="userContainer" style="display:none;">
+                    Привет, <span id="userNickname"></span>!
+                    <button class="btn-small" id="logoutBtn">Выйти</button>
+                  </div>
+            </div>
+          </div>
+        
+          <!-- Список группировок -->
+          <div class="stash-grid" id="groupsList">
+          </div>
+          </div>
+          
+          <!-- GROUP CREATE FORM -->
+          <div id="groupFormContainer" class="popup-form" style="display:none;">
+            <div class="form-header" id="groupFormTitle">
+            Создать группировку
+            </div>
+          
+            <form id="groupForm">
+              <div class="form-group">
+                <label for="groupName">Название</label>
+                <input
+                  type="text"
+                  id="groupName"
+                  class="form-input"
+                  placeholder="Например: Чистое Небо"
+                  required
+                >
+              </div>
+          
+              <div class="form-group">
+                <label for="groupDesc">Описание</label>
+                <textarea
+                  id="groupDesc"
+                  class="form-input"
+                  placeholder="Описание группировки"
+                ></textarea>
+              </div>
+          
+              <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Создать</button>
+                <button type="button" class="btn" id="groupCancel">Отмена</button>
+              </div>
+            </form>
+          </div>
+        
+        <!-- LOGIN / REGISTER FORM POPUP -->
+        <div id="loginFormContainer" class="popup-form" style="display:none;">
+          <div class="form-header">
+            Вход / Регистрация
+          </div>
+        
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" class="form-input" placeholder="stalker@zone.ru" required>
+            </div>
+        
+            <div class="form-group">
+              <label for="loginPassword">Пароль</label>
+              <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+            </div>
+        
+            <div class="form-group">
+              <label for="loginNickname">Никнейм (только для регистрации)</label>
+              <input type="text" id="loginNickname" class="form-input" placeholder="Ваш никнейм">
+            </div>
+        
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary" id="loginSubmitBtn">Войти</button>
+              <button type="button" class="btn" id="registerSubmitBtn">Регистрация</button>
+              <button type="button" class="btn" id="loginCancelBtn">Отмена</button>
+            </div>
+          </form>
         </div>
+
     </div>
-    
+
+
     <!-- GPS кнопка -->
     <div id="myPositionBtn" class="gps-button">
       <div class="gps-icon">⌖</div>
@@ -225,7 +319,6 @@
         <button class="btn btn-danger" id="popupDelete">Удалить</button>
       </div>
     </div>
-    <div id="customCursor"></div>
     <!-- В head после leaflet.css -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.0.0/Control.FullScreen.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.78.0/dist/L.Control.Locate.min.css" />
@@ -242,7 +335,6 @@
     <script src="scripts/map.js"></script>
     <script src="scripts/ui.js"></script>
     <script src="scripts/database.js"></script>
-
     <script src="main.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">

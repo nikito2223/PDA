@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/nikito2223/PDA#readme",
   "dependencies": {
-    "electron": "^39.2.7"
+    "electron": "^39.2.7",
+    "systeminformation": "^5.30.2"
   }
 }

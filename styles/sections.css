@@ -960,6 +960,569 @@ textarea.form-input {
   }
 }
 
+@media (max-width: 768px) {
+  #pda {
+    flex-direction: column;
+    border-width: 8px;
+  }
+  
+  #menu {
+    width: 100%;
+    height: auto;
+    min-height: 80px;
+    max-height: 80px;
+    border-right: none;
+    border-bottom: 2px solid #3a4d3a;
+    flex-direction: row;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    transition: max-height 0.3s ease;
+  }
+  
+  #menu.mobile-open {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .menu-header {
+    display: none;
+  }
+  
+  .menu-items-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px 5px;
+  }
+  
+  .menu-item {
+    flex-direction: column;
+    padding: 8px 10px;
+    margin: 0 5px;
+    min-width: 80px;
+    max-width: 100px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    text-align: center;
+    font-size: 11px;
+    min-height: 70px;
+    justify-content: center;
+  }
+  
+  .menu-item:hover {
+    border-left: none;
+    border-bottom: 3px solid #8b9d6b;
+  }
+  
+  .menu-item.active {
+    border-left: none;
+    border-bottom: 3px solid #c7fec7;
+  }
+  
+  .menu-icon {
+    font-size: 20px;
+    width: auto;
+    margin-bottom: 5px;
+  }
+  
+  .menu-text {
+    font-size: 10px;
+    white-space: normal;
+    line-height: 1.2;
+  }
+  
+  .menu-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 9px;
+    padding: 1px 5px;
+    min-width: 18px;
+  }
+  
+  .filter-controls {
+    display: none;
+  }
+  
+  .filter-controls.mobile-visible {
+    display: block;
+    margin: 10px;
+    padding: 10px;
+  }
+  
+  .menu-footer {
+    display: none;
+  }
+  
+  .menu-footer.mobile-visible {
+    display: block;
+    padding: 10px;
+  }
+  
+  #content {
+    height: calc(100% - 80px);
+  }
+  
+  .pda-status-bar {
+    left: 0;
+    font-size: 10px;
+    padding: 0 10px;
+    justify-content: space-around;
+    height: 26px;
+    flex-wrap: wrap;
+  }
+  
+  .pda-status-bar .status-item {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .status-icon {
+    font-size: 12px;
+  }
+  
+  /* Карта и контролы */
+  .map-controls {
+    top: 5px;
+    right: 5px;
+    gap: 5px;
+  }
+  
+  .control-group {
+    padding: 6px;
+  }
+  
+  .map-control-btn {
+    min-width: 110px;
+    padding: 8px 10px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+  
+  /* GPS кнопка */
+  #myPositionBtn {
+    bottom: 10px;
+    right: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    min-height: 44px;
+  }
+  
+  .gps-icon {
+    font-size: 18px;
+  }
+  
+  /* Панель навигации */
+  #navigationPanel {
+    bottom: 70px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+    padding: 15px;
+  }
+  
+  /* Список тайников */
+  .stash-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .list-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .stash-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 5px;
+  }
+  
+  .stash-card {
+    min-height: 140px;
+    padding: 12px;
+  }
+  
+  .stash-name {
+    font-size: 15px;
+  }
+  
+  .stash-desc {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+  
+  .stash-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  
+  .stash-action-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+  
+  /* Формы и попапы */
+  #stashFormContainer {
+    width: 95vw;
+    max-height: 85vh;
+    padding: 15px;
+    overflow-y: auto;
+  }
+  
+  .form-header {
+    font-size: 16px;
+  }
+  
+  .form-group label {
+    font-size: 12px;
+  }
+  
+  .form-input, .form-select {
+    padding: 10px 12px;
+    font-size: 16px; /* Предотвращает масштабирование в iOS */
+  }
+  
+  .btn {
+    padding: 10px;
+    font-size: 13px;
+    min-height: 44px;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  #stashPopup {
+    width: 90vw;
+    max-width: 90vw;
+    padding: 15px;
+  }
+  
+  /* Leaflet controls */
+  .leaflet-control-zoom {
+    margin: 10px !important;
+  }
+  
+  .leaflet-control-zoom a {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 18px !important;
+  }
+  
+  /* Мобильное меню */
+  .mobile-menu-toggle {
+    display: flex;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #2a352a;
+    border: 1px solid #3a4d3a;
+    color: #c7fec7;
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    font-size: 20px;
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+  
+  .mobile-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+  #menu {
+    min-height: 70px;
+    max-height: 70px;
+  }
+  
+  .menu-item {
+    min-width: 70px;
+    max-width: 80px;
+    padding: 6px 8px;
+    min-height: 65px;
+  }
+  
+  .menu-icon {
+    font-size: 18px;
+  }
+  
+  .menu-text {
+    font-size: 9px;
+  }
+  
+  #content {
+    height: calc(100% - 70px);
+  }
+  
+  .pda-status-bar {
+    font-size: 9px;
+    height: 24px;
+  }
+  
+  .pda-status-bar .status-item {
+    min-width: 100px;
+  }
+  
+  .map-control-btn {
+    min-width: 100px;
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+  
+  .stash-grid {
+    gap: 8px;
+  }
+  
+  .stash-card {
+    min-height: 130px;
+    padding: 10px;
+  }
+  
+  .stash-name {
+    font-size: 14px;
+  }
+  
+  .stash-desc {
+    font-size: 11px;
+  }
+  
+  .stash-action-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  
+  /* Скрыть часть текста на очень маленьких экранах */
+  .gps-text {
+    display: none;
+  }
+  
+  #myPositionBtn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .gps-icon {
+    margin: 0;
+    font-size: 22px;
+  }
+  
+  .status-label {
+    display: none;
+  }
+  
+  .status-icon {
+    margin-right: 0;
+  }
+}
+
+/* Планшеты в портретном режиме (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #menu {
+    width: 200px;
+    min-width: 200px;
+  }
+  
+  .pda-status-bar {
+    left: 200px;
+  }
+  
+  .stash-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+/* Планшеты в ландшафтном режиме (1024px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
+  #menu {
+    width: 220px;
+    min-width: 220px;
+  }
+  
+  .pda-status-bar {
+    left: 17%;
+    bottom: 1.8%;
+  }
+  
+  .stash-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* === TOUCH OPTIMIZATIONS === */
+@media (hover: none) and (pointer: coarse) {
+  /* Увеличиваем области касания для мобильных */
+  .menu-item,
+  .map-control-btn,
+  .btn,
+  .stash-card,
+  .stash-action-btn,
+  .leaflet-control-zoom a {
+    min-height: 44px;
+  }
+  
+  /* Убираем hover-эффекты для тач-устройств */
+  .menu-item:hover,
+  .map-control-btn:hover,
+  .btn:hover,
+  .stash-card:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Активное состояние для касаний */
+  .menu-item:active,
+  .map-control-btn:active,
+  .btn:active,
+  .stash-action-btn:active {
+    background: linear-gradient(to bottom, #3a4d3a, #2a352a) !important;
+    transform: scale(0.98);
+  }
+  
+  /* Делаем скроллбар шире для удобного захвата */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  /* Увеличиваем области клика для маркеров */
+  .leaflet-marker-icon {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+}
+
+/* Ландшафтная ориентация на мобильных */
+@media (max-height: 500px) and (orientation: landscape) {
+  #menu {
+    min-height: 60px;
+    max-height: 60px;
+  }
+  
+  .menu-item {
+    min-width: 60px;
+    padding: 5px 6px;
+    min-height: 55px;
+  }
+  
+  .menu-icon {
+    font-size: 16px;
+  }
+  
+  .menu-text {
+    font-size: 8px;
+  }
+  
+  #content {
+    height: calc(100% - 60px);
+  }
+  
+  .pda-status-bar {
+    height: 22px;
+    font-size: 9px;
+  }
+  
+  .map-controls {
+    top: 5px;
+    right: 5px;
+  }
+  
+  .control-group {
+    padding: 5px;
+  }
+  
+  .map-control-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 100px;
+  }
+  
+  #myPositionBtn {
+    bottom: 5px;
+    right: 5px;
+    padding: 8px 10px;
+  }
+}
+
+/* === SAFARI SPECIFIC FIXES === */
+@supports (-webkit-touch-callout: none) {
+  /* Исправления для iOS Safari */
+  #pda {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    height: -webkit-fill-available;
+  }
+  
+  #menu {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #stashesSection,
+  #journalSection {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Предотвращаем bounce-эффект на iOS */
+  #stashesSection::-webkit-scrollbar,
+  #journalSection::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* === HIGH DPI SCREENS === */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .marker-glow {
+    border-width: 1.5px !important;
+  }
+  
+  #pda {
+    border-width: 6px;
+  }
+}
+
+/* === DARK MODE SUPPORT === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --stalker-green: #b0f0b0;
+    --stalker-text: #d0e0d0;
+  }
+}
+
 /* === LOADING STATE === */
 .loading-spinner {
   text-align: center;

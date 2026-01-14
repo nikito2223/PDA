@@ -305,6 +305,12 @@ const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 async function initUI()  {
   console.log('Инициализация интерфейса...');
 
+    if (isMobile || isTouchDevice) {
+        document.body.classList.add('mobile-device');
+        if (isMobile) document.body.classList.add('is-mobile');
+        if (isTouchDevice) document.body.classList.add('is-touch');
+    }
+
   // Проверяем авторизацию
   await checkAuth();
 
@@ -772,94 +778,46 @@ function optimizeTouchEvents() {
 
 function addSwipeGestures() {
   if (!isTouchDevice) return;
-  
+
   let touchStartX = 0;
   let touchStartY = 0;
-  
+  let touchStartedOnMap = false;
+
   document.addEventListener('touchstart', function(e) {
-    if (e.touches && e.touches.length > 0) {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }
+    if (!e.touches || e.touches.length === 0) return;
+
+    const target = e.target;
+
+    // ❌ Если касание началось на карте — запрещаем свайпы вкладок
+    touchStartedOnMap =
+      target.closest('.leaflet-container') !== null;
+
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
   }, { passive: true });
-  
+
   document.addEventListener('touchend', function(e) {
+    if (touchStartedOnMap) return; // ⛔ ВАЖНО
+
     if (!e.changedTouches || e.changedTouches.length === 0) return;
-    
+
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
-    
+
     const diffX = touchStartX - touchEndX;
     const diffY = touchStartY - touchEndY;
-    
-    // Определяем свайп
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      // Горизонтальный свайп
-      if (Math.abs(diffX) > 50) {
-        if (diffX > 0) {
-          // Свайп влево
-          handleSwipeLeft();
-        } else {
-          // Свайп вправо
-          handleSwipeRight();
-        }
-      }
-    } else {
-      // Вертикальный свайп
-      if (Math.abs(diffY) > 50) {
-        if (diffY > 0) {
-          // Свайп вверх
-          handleSwipeUp();
-        } else {
-          // Свайп вниз
-          handleSwipeDown();
-        }
+
+    // Горизонтальный свайп
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        handleSwipeLeft();
+      } else {
+        handleSwipeRight();
       }
     }
   }, { passive: true });
-  
-  function handleSwipeLeft() {
-    const activeBtn = document.querySelector('.menu-item.active');
-    if (!activeBtn) return;
-    
-    const activeIndex = Array.from(menuButtons).indexOf(activeBtn);
-    if (activeIndex < menuButtons.length - 1) {
-      menuButtons[activeIndex + 1].click();
-    }
-  }
-  
-  function handleSwipeRight() {
-    const activeBtn = document.querySelector('.menu-item.active');
-    if (!activeBtn) return;
-    
-    const activeIndex = Array.from(menuButtons).indexOf(activeBtn);
-    if (activeIndex > 0) {
-      menuButtons[activeIndex - 1].click();
-    }
-  }
-  
-  function handleSwipeUp() {
-    if (popup && popup.style.display === 'block') {
-      popup.style.display = 'none';
-    }
-    if (stashFormContainer && stashFormContainer.style.display === 'block') {
-      stashFormContainer.style.display = 'none';
-    }
-    const navPanel = document.getElementById('navigationPanel');
-    if (navPanel && navPanel.style.display === 'block') {
-      if (window.mapModule && window.mapModule.stopNavigation) {
-        window.mapModule.stopNavigation();
-      }
-    }
-  }
-  
-  function handleSwipeDown() {
-    const gpsBtn = document.getElementById('myPositionBtn');
-    if (gpsBtn && gpsBtn.style.opacity === '0') {
-      gpsBtn.style.opacity = '1';
-    }
-  }
 }
+
 
 function preventLongPressContextMenu() {
   if (!isTouchDevice) return;
@@ -973,6 +931,7 @@ document.addEventListener('visibilitychange', function() {
 // === ЭКСПОРТ ФУНКЦИЙ ===
 window.uiModule = {
   initUI,
+  updateMobileUI,
   showStashPopup,
   openEditForm,
   updateStatusBar,

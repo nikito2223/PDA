@@ -11,8 +11,8 @@ function createWindow() {
   });
 
   // Подключаемся к сайту на GitHub Pages
-  /*win.loadURL('https://nikito2223.github.io/PDA');*/
-  win.loadFile("index.html");
+  win.loadURL('https://nikito2223.github.io/PDA');
+  // win.loadFile("index.html");
 
     // Разрешаем геолокацию
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {

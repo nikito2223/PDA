@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "io.github.nikito2223.pdaweb"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDA Web</string>
+    <string name="toolbar_title">PDA Веб-портал</string>
+    <string name="loading">Загрузка страницы…</string>
+</resources>

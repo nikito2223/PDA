@@ -32,7 +32,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import org.osmdroid.views.overlay.mapevents.MapEventsReceiver
+import org.osmdroid.events.MapEventsReceiver
 
 class MapFragment : Fragment() {
 

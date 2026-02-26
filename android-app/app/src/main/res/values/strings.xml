@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDA Native</string>
+    <string name="toolbar_title">PDA</string>
+    <string name="loading">Загрузка…</string>
+    <string name="title_map">Карта</string>
+    <string name="title_stashes">Тайники</string>
+    <string name="title_journal">Дневник</string>
+    <string name="title_groups">Группировки</string>
+</resources>

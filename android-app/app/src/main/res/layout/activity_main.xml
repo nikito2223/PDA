@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@drawable/pda_background_panel">
+
+    <LinearLayout
+        android:id="@+id/sideMenu"
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/pda_background_menu"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2a352a"
+            android:padding="12dp"
+            android:text="ПДА V1.6"
+            android:textAllCaps="true"
+            android:textColor="#C7FEC7"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menuMap"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="🗺 Карта" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menuStashes"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="📦 Тайники" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menuJournal"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="📔 Дневник" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menuGroups"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="👥 Группировки" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/gpsStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GPS: ⏳"
+                android:textColor="#8b9d6b"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/markerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="МЕТОК: 0"
+                android:textColor="#8b9d6b"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#232722"
+            android:padding="10dp"
+            android:text="Карта"
+            android:textColor="#C7FEC7"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:background="#10130f" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#1a1c18"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/statusLeft"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="СИГНАЛ: СТАБИЛЬНЫЙ"
+                android:textColor="#8b9d6b"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/statusRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="РЕЖИМ: ONLINE"
+                android:textColor="#8b9d6b"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

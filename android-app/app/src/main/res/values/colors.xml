@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="deep_blue">#1E3A8A</color>
-    <color name="light_blue">#38BDF8</color>
-    <color name="white">#FFFFFF</color>
+    <color name="deep_blue">#1A1C18</color>
+    <color name="light_blue">#2A352A</color>
+    <color name="white">#E0F0E0</color>
     <color name="neon_green">#7CFC98</color>
 </resources>

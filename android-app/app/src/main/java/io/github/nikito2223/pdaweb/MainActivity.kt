@@ -22,15 +22,10 @@ class MainActivity : AppCompatActivity() {
             openFragment(MapFragment.newInstance(), getString(R.string.title_map))
         }
 
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_map -> openFragment(MapFragment.newInstance(), getString(R.string.title_map))
-                R.id.nav_stashes -> openFragment(StashesFragment.newInstance(), getString(R.string.title_stashes))
-                R.id.nav_journal -> openFragment(JournalFragment.newInstance(), getString(R.string.title_journal))
-                R.id.nav_groups -> openFragment(GroupsFragment.newInstance(), getString(R.string.title_groups))
-                else -> false
-            }
-        }
+        binding.menuMap.setOnClickListener { openFragment(MapFragment.newInstance(), getString(R.string.title_map)) }
+        binding.menuStashes.setOnClickListener { openFragment(StashesFragment.newInstance(), getString(R.string.title_stashes)) }
+        binding.menuJournal.setOnClickListener { openFragment(JournalFragment.newInstance(), getString(R.string.title_journal)) }
+        binding.menuGroups.setOnClickListener { openFragment(GroupsFragment.newInstance(), getString(R.string.title_groups)) }
     }
 
     private fun openFragment(fragment: Fragment, title: String): Boolean {
@@ -38,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragmentContainer, fragment)
             .commit()
 
-        binding.toolbar.title = title
+        binding.toolbarTitle.text = title
         return true
     }
 }

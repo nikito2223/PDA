@@ -51,14 +51,14 @@ class MapFragment : Fragment() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) {}
 
-    private val satelliteTile = XYTileSource(
-        "EsriSat",
+    private val darkTile = XYTileSource(
+        "CartoDark",
         0,
         19,
         256,
-        ".jpg",
-        arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"),
-        "© Esri"
+        ".png",
+        arrayOf("https://basemaps.cartocdn.com/dark_all/"),
+        "© CARTO"
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -106,7 +106,7 @@ class MapFragment : Fragment() {
         }
 
         styleButton.setOnClickListener {
-            mapStyle = if (mapStyle == MapStyle.NORMAL) MapStyle.SATELLITE else MapStyle.NORMAL
+            mapStyle = if (mapStyle == MapStyle.NORMAL) MapStyle.DARK else MapStyle.NORMAL
             applyMapStyle()
         }
 
@@ -135,12 +135,12 @@ class MapFragment : Fragment() {
     }
 
     private fun applyMapStyle() {
-        if (mapStyle == MapStyle.SATELLITE) {
-            binding.mapView.setTileSource(satelliteTile)
-            binding.styleButton.text = "Стиль: Спутник"
+        if (mapStyle == MapStyle.DARK) {
+            binding.mapView.setTileSource(darkTile)
+            binding.styleButton.text = "Стиль: Ночная"
         } else {
             binding.mapView.setTileSource(TileSourceFactory.MAPNIK)
-            binding.styleButton.text = "Стиль: Обычная"
+            binding.styleButton.text = "Стиль: Здания"
         }
         binding.mapView.invalidate()
     }
@@ -262,9 +262,7 @@ class MapFragment : Fragment() {
     }
 
     private fun clearMarkers(keepUserMarkers: Boolean) {
-        binding.mapView.overlays.removeAll { overlay ->
-            overlay is Marker
-        }
+        binding.mapView.overlays.removeAll { it is Marker }
         if (!keepUserMarkers) customMarkers.clear()
     }
 
@@ -389,7 +387,7 @@ class MapFragment : Fragment() {
     }
 }
 
-private enum class MapStyle { NORMAL, SATELLITE }
+private enum class MapStyle { NORMAL, DARK }
 private enum class MapMode { OVERVIEW, CREATE_MARKER }
 
 private enum class LocationMode(val title: String, val center: GeoPoint, val zoom: Double) {
